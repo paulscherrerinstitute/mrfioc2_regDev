@@ -1,0 +1,29 @@
+epicsEnvSet SYS "FTEST-VME-TIMING-RXTEST"
+epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
+
+##########################
+#-----! EVR Setup ------!#
+##########################
+require mrfioc2
+## Check mrfioc2 project for details on how to set up the event receivers and generators
+
+runScript $($(MODULE)_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$($(MODULE)_TEMPLATES)/evr_VME-300.subs"
+
+
+########################################
+#------! Bunch ID receive setup ------!#
+########################################
+# Require mrfioc2_regDev module for each EVR and/or EVG you need. EV macro specifies EVR/EVG card name.
+require mrfioc2_regDev, "EV=$(EVR)"
+
+# Pass macros to the runScript command (or define them using epicsEnvSet):
+# - OFFSET: 	 Data buffer offset to read fromread from
+# - ID: 		 A unique name for this offset
+# - PARAMS:		 Parameters to pass to regDev. For details about the parameters check regDev documentation
+# - RECORD_TYPE: Type of the EPICS record. Currently only 'ai' is supported.
+# - SYS: 		 system name
+# - EVR: 		 event receiver card name (default: EVR0)
+#
+runScript $($(MODULE)_DIR)/mrfioc2_regDev_Rx.cmd, "ID=PULSEID, 	OFFSET=0x08, PARAMS=T=UINT32"
+runScript $($(MODULE)_DIR)/mrfioc2_regDev_Rx.cmd, "ID=SEC, 		OFFSET=0x10, PARAMS=T=UINT32"
+runScript $($(MODULE)_DIR)/mrfioc2_regDev_Rx.cmd, "ID=NSEC, 	OFFSET=0x14, PARAMS=T=UINT32"

@@ -1,0 +1,19 @@
+epicsEnvSet SYS "FTEST-VME-BUNCHTXTST"
+epicsEnvSet EVG	"EVG0"
+
+##########################
+#-----! EVG Setup ------!#
+##########################
+require mrfioc2
+## Check mrfioc2 project for details on how to set up the event receivers and generators
+
+runScript $($(MODULE)_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$($(MODULE)_TEMPLATES)/evr_VME-300.subs"
+
+
+########################################
+#------! Bunch ID TX setup ------!#
+########################################
+require mrfioc2_regDev, "EV=$(EVG)"
+
+# The following command accepts macros SYS and EVG
+runScript $($(MODULE)_DIR)/mrfioc2_regDev_bunchID_Tx.cmd

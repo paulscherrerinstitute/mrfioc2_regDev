@@ -1,0 +1,5 @@
+record(ai, "$(SYS)-$(EV):$(ID)-RX") {
+  field(DTYP, "regDev")
+  field(INP, "@$(EV)DBUFF:$(OFFSET) $(PARAMS)")
+  field(SCAN, "I/O Intr")
+}

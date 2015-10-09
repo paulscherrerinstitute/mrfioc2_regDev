@@ -1,0 +1,100 @@
+# Bunch ID data buffer transmission
+#
+# Mandatory macros:
+#  SYS = System name (ie FIN)
+#  EVG = Device name (ie EVG0)
+#  EVGDBUFF = EVG regDev name as configured with  mrfiocDBuffConfigure() (ie EVGDBUFF)
+#  
+# Optional macros:
+#  PULSEID_OFFSET= address offset (default: 0x08)
+#  MASTSEC_OFFSET= (default: 0x10)
+#  MASTNSEC_OFFSET= (default: 0x14)
+#  DUMMY= (default: 0x7F0)
+#
+# Description:
+#
+# This database transmits the bunch id via databuffer, using Tom Slejko's driver
+# (regDev). It loads the bunchId integer into the appropriate register and then flushes
+# the buffer.
+#
+record(ao, "$(SYS)-$(EVG):BunchIdTx-I") {
+  field(DTYP, "regDev")
+  field(OUT, "@$(EVGDBUFF):$(PULSEID_OFFSET=0x08) T=double")
+  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP")
+}
+
+# reads timestamp (of the master) 
+# and overwrites the 16 LSB of 32-bits nsec with 16 LSB of pulse ID
+# it gives seconds past epics epoch in VAL
+# it gives nsec of epics timestamp in RVAL  
+#
+record(ai,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP") {
+  field(DTYP,"Soft Timestamp")
+  field(INP,"$(SYS)-$(EVG):BunchIdTx-I")
+  field(TSE,"-2")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-SEC")
+}
+
+record(calcout,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-SEC") {
+  field(DTYP, "regDev")
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP.VAL")    # master timestamp seconds
+  field(CALC,"A")
+  field(OUT, "@$(EVGDBUFF):$(MASTSEC_OFFSET=0x10) T=UINT32")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-NSEC")
+}
+
+record(calcout,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-NSEC") {
+  field(DTYP, "regDev")
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP.RVAL")   # master timestamp nanoseconds
+  field(CALC,"A")
+  field(OUT, "@$(EVGDBUFF):$(MASTNSEC_OFFSET=0x14) T=UINT32")
+  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE")
+}
+
+
+record(ao,"$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE") {
+  field(DTYP, "regDev")
+  field(OUT, "@$(EVGDBUFF):$(DUMMY=0x7F0) T=UINT32")
+  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-Flush_")
+}
+
+record(longout, "$(SYS)-$(EVG):BunchIdTx-Flush_") {
+  field(DTYP, "regDev")
+  field(OUT, "@$(EVGDBUFF):0x0")
+  field(VAL, "1")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-TS-1")
+}
+
+record(calcout, "$(SYS)-$(EVG):BunchIdTx_") {
+  field(CALC, "A")
+  field(INPA, "$(SYS)-$(EVG):BunchIdTx-PulseCounter")
+  field(OUT, "$(SYS)-$(EVG):BunchIdTx-I PP")
+  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-jump-counter")
+}
+
+record(calcout,"$(SYS)-$(EVG):BunchIdTx-jump-counter") {         
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx_")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-jump-counter")
+  field(INPC,"$(SYS)-$(EVG):BunchIdTx-jump-counter.OVAL")
+  field(CALC,"A")
+  field(OCAL,"A-B#1?C+1:C")
+  field(OOPT,"When Non-zero")
+  field(DOPT,"Use OCAL")
+}
+
+#### measures time interval between pulse ID arraivals ###
+record(ai,"$(SYS)-$(EVG):BunchIdTx-TS-1") {
+  field(DTYP,"Soft Timestamp")
+  field(PREC,"9")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF")
+}
+
+record(calcout,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF") {         
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-TS-1")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF")
+  field(INPC,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF.OVAL")
+  field(CALC,"A")
+  field(OCAL,"B=0?0:(A-B)>C?A-B:C")
+  field(DOPT,"Use OCAL")
+  field(PREC,"4")
+}

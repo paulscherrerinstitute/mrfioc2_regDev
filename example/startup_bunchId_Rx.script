@@ -1,0 +1,19 @@
+epicsEnvSet SYS "FTEST-VME-BUNCHRXTST"
+epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
+
+##########################
+#-----! EVR Setup ------!#
+##########################
+require mrfioc2
+## Check mrfioc2 project for details on how to set up the event receivers and generators
+
+runScript $($(MODULE)_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$($(MODULE)_TEMPLATES)/evr_VME-300.subs"
+
+
+########################################
+#------! Bunch ID receive setup ------!#
+########################################
+require mrfioc2_regDev, "EV=$(EVR)"
+
+# The following command accepts macros SYS and EVR
+runScript $($(MODULE)_DIR)/mrfioc2_regDev_bunchID_Rx.cmd
