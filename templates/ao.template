@@ -1,0 +1,4 @@
+record(ao, "$(SYS)-$(EV):$(ID)-TX") {
+  field(DTYP, "regDev")
+  field(OUT, "@$(EV)DBUFF:$(OFFSET) $(PARAMS)")
+}

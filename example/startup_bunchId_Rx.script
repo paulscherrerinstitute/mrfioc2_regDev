@@ -13,7 +13,8 @@ runScript $($(MODULE)_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$($(MODULE)
 ########################################
 #------! Bunch ID receive setup ------!#
 ########################################
-require mrfioc2_regDev, "EV=$(EVR)"
+# The require command accepts macros EVR or EVG
+require mrfioc2_regDev
 
 # The following command accepts macros SYS and EVR
 runScript $($(MODULE)_DIR)/mrfioc2_regDev_bunchID_Rx.cmd

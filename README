@@ -39,6 +39,12 @@
 **      is received
 **
 **
+** BUILDING the module:
+**
+**    - On PSI infrastructure run `make` in this folder.
+**
+**    - To build as a standard EPICS library run `make -f Makefile` in this folder
+**
 **
 ** -- SUPPORTED DEVICES -----------------------------------------------------
 **

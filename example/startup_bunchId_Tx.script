@@ -13,7 +13,8 @@ runScript $($(MODULE)_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$($(MODULE)
 ########################################
 #------! Bunch ID TX setup ------!#
 ########################################
-require mrfioc2_regDev, "EV=$(EVG)"
+# The require command accepts macros EVR or EVG
+require mrfioc2_regDev
 
 # The following command accepts macros SYS and EVG
 runScript $($(MODULE)_DIR)/mrfioc2_regDev_bunchID_Tx.cmd

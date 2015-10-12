@@ -13,8 +13,8 @@ runScript $($(MODULE)_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$($(MODULE)
 ########################################
 #------! Bunch ID receive setup ------!#
 ########################################
-# Require mrfioc2_regDev module for each EVR and/or EVG you need. EV macro specifies EVR/EVG card name.
-require mrfioc2_regDev, "EV=$(EVR)"
+# Require mrfioc2_regDev module for each EVR and/or EVG you need. The command accepts EVR or EVG macro
+require mrfioc2_regDev
 
 # Pass macros to the runScript command (or define them using epicsEnvSet):
 # - OFFSET: 	 Data buffer offset to read fromread from
