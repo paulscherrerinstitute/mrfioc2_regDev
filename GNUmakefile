@@ -16,6 +16,7 @@ DBDS += src/mrfregdev.dbd
 TEMPLATES += templates/bunchId_Rx.template
 TEMPLATES += templates/bunchId_Tx.template
 TEMPLATES += template/ai.template
+TEMPLATES += template/ao.template
 
 # If there is no numbered version of the mrfioc2 driver available
 # you can specify which version to build agains here:
