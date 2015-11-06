@@ -1,13 +1,15 @@
 include /ioc/tools/driver.makefile
 
 MODULE=mrfioc2_regDev
-#LIBVERSION=test
+#LIBVERSION=tma_test
 
 
 BUILDCLASSES += Linux
 EXCLUDE_VERSIONS=3.13 3.14.8
 ARCH_FILTER=eldk52-e500v2 eldk42-ppc4xxFP SL%
+#ARCH_FILTER=eldk52-e500v2
 
+#REQUIRED = settimestamp # not installed in /modules yet
 
 SOURCES += src/drvMrfiocDBuff.cpp
 

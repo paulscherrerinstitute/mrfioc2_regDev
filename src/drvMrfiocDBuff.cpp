@@ -88,19 +88,20 @@
 #include <epicsEndian.h>
 #include <regDev.h>
 #include <mrmDataBufferUser.h>
+#include <mrmShared.h> // for data buffer max length
 #include <errlog.h>
 
 /*                                        */
 /*        DEFINES                         */
 /*                                        */
 
-int drvMrfiocDBuffDebug = 0;
-epicsExportAddress(int, drvMrfiocDBuffDebug);
+int drvMrfiocRegDevDebug = 0;
+epicsExportAddress(int, drvMrfiocRegDevDebug);
 
 #if defined __GNUC__ && __GNUC__ < 3
-#define dbgPrintf(args...)  if(drvMrfiocDBuffDebug) printf(args);
+#define dbgPrintf(args...)  if(drvMrfiocRegDevDebug) printf(args);
 #else
-#define dbgPrintf(...)  if(drvMrfiocDBuffDebug) printf(__VA_ARGS__);
+#define dbgPrintf(...)  if(drvMrfiocRegDevDebug) printf(__VA_ARGS__);
 #endif
 
 #if defined __GNUC__
@@ -139,7 +140,7 @@ epicsUInt8 buffAddr;
 static void mrfiocDBuff_flush(regDevice* device)
 {
     /* Copy protocol ID (big endian) */
-    device->dataBuffer->put(PROTO_START, sizeof(device->proto), &device->proto);
+    //device->dataBuffer->put(PROTO_START, sizeof(device->proto), &device->proto);
 
     /* Send out the data */
     device->dataBuffer->send(false);
@@ -157,7 +158,7 @@ static void mrfiocDBuff_flush(regDevice* device)
 void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
     regDevice* device = (regDevice *)pvt;
 
-    if (device->proto != 0)
+    /*if (device->proto != 0)
     {
         // Extract protocol ID
         epicsUInt32 receivedProtocolID;
@@ -166,7 +167,7 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
         dbgPrintf("mrmEvrDataRxCB %s: protocol ID = %d\n", device->name, receivedProtocolID);
 
         if (device->proto != receivedProtocolID) return;
-    }
+    }*/
 
     dbgPrintf("Received new DATA at %d+%d\n", updated_offset, length);
     device->dataBuffer->get(updated_offset, length, &device->rxBuffer[updated_offset]);
@@ -200,6 +201,7 @@ int mrfiocDBuff_read(
         regDevTransferComplete _unused(callback),
         char* user)
 {
+    //TODO out of bounds check
     //dbgPrintf("mrfiocDBuff_read %s: from %s:0x%x len: 0x%x receive_status = %d\n", user, device->name, (int)offset, (int)(datalength*nelem), device->receive_status);
     dbgPrintf("mrfiocDBuff_read %s: from %s:0x%x len: 0x%x\n",
             user, device->name, (int)offset, (int)(datalength*nelem));
@@ -231,6 +233,7 @@ int mrfiocDBuff_write(
         mrfiocDBuff_flush(device);
         return 0;
     }
+    // TODO out of bounds check
 
     /* Copy into the scratch buffer */
     /* Data in buffer is in big endian byte order */
@@ -296,11 +299,6 @@ void mrfiocDBuffConfigure(const char* regDevName, const char* mrfName, int proto
      * Create new data buffer user.
      */
     device->dataBuffer = new mrmDataBufferUser();    // TODO where to put destructor??
-
-    if (!device->dataBuffer) {
-        errlogPrintf("mrfiocDBuffConfigure %s: FAILED! Can not connect to mrf data buffer on device: %s\n", regDevName, mrfName);
-        return;
-    }
 
     if (device->dataBuffer->init(mrfName) != 0) {
         errlogPrintf("mrfiocDBuffConfigure %s: FAILED to initialize data buffer on device %s\n", regDevName, mrfName);

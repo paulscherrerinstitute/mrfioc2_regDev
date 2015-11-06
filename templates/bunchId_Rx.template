@@ -6,10 +6,10 @@
 #  EVRDBUFF = EVR regDev name as configured with  mrfiocDBuffConfigure() (ie EVRDBUFF)
 #  
 # Optional macros:
-#  PULSEID_OFFSET = address offset (0x08)
-#  MASTSEC_OFFSET = seconds offset (default: 0x10)
-#  MASTNSEC_OFFSET = nsec offset (default: 0x14)
-#  DUMMYWF_OFFSET = offset for the dummy WF. (default: 0x18)
+#  PULSEID_OFFSET = address offset (0x10)
+#  MASTSEC_OFFSET = seconds offset (default: 0x18)
+#  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  DUMMYWF_OFFSET = offset for the dummy WF. (default: 0x28)
 #
 # Description:
 #
@@ -18,7 +18,7 @@
 
 record(ai, "$(SYS)-$(EVR):BunchIdRx-I") {
   field(DTYP, "regDev")
-  field(INP, "@$(EVRDBUFF):$(PULSEID_OFFSET=0x08) T=double")
+  field(INP, "@$(EVRDBUFF):$(PULSEID_OFFSET=0x10) T=double")
   field(SCAN, "I/O Intr")
   field(PRIO, "HIGH")
   field(FLNK, "$(SYS)-$(EVR):BunchIdRx-jump-counter")
@@ -38,26 +38,26 @@ record(calcout,"$(SYS)-$(EVR):BunchIdRx-jump-counter") {
 record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-SEC") {
   field(DTYP, "regDev")
   field(SCAN, "I/O Intr")
-  field(INP, "@$(EVRDBUFF):$(MASTSEC_OFFSET=0x10) T=UINT32")
+  field(INP, "@$(EVRDBUFF):$(MASTSEC_OFFSET=0x18) T=UINT32")
   field(FLNK, "$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC")
   field(PRIO, "HIGH")
 }
 
 record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC") {
   field(DTYP, "regDev")
-  field(INP, "@$(EVRDBUFF):$(MASTNSEC_OFFSET=0x14) T=UINT32")
+  field(INP, "@$(EVRDBUFF):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
   field(PRIO, "HIGH")
   field(FLNK, "$(SYS)-$(EVR):BunchIdRx-SET-TIMESTAMP")
 }
 
-record(waveform,"$(SYS)-$(EVR):BunchIdRx-MASTER-DUMMY-WF") {
-  field(DTYP, "regDev")
-  field(NELM,"500")                        
-  field(FTVL,"ULONG")
-  field(INP, "@$(EVRDBUFF):$(DUMMYWF_OFFSET=0x18) T=UINT32")
-  field(SCAN, "I/O Intr")
-  field(PRIO, "HIGH")
-}
+#record(waveform,"$(SYS)-$(EVR):BunchIdRx-MASTER-DUMMY-WF") {
+#  field(DTYP, "regDev")
+#  field(NELM,"500")                        
+#  field(FTVL,"ULONG")
+#  field(INP, "@$(EVRDBUFF):$(DUMMYWF_OFFSET=0x28) T=UINT32")
+#  field(SCAN, "I/O Intr")
+#  field(PRIO, "HIGH")
+#}
 
 # reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
