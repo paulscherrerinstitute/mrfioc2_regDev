@@ -1,2 +1,2 @@
 registrar(mrfiocDBuffRegistrar)
-variable(drvMrfiocDBuffDebug, int)
+variable(drvMrfiocRegDevDebug, int)

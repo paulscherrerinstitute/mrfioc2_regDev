@@ -16,8 +16,5 @@ runScript $(mrfioc2_regDev_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$(mrfi
 # The require command accepts macros EVR or EVG
 require mrfioc2_regDev
 
-# Initialize the reg dev to data buffer connection
-mrfiocDBuffConfigure $(EVG)DBUFF $(EVG) 1
-
 # The following command accepts macros SYS and EVG
 runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_bunchID_Tx.cmd

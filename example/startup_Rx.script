@@ -19,14 +19,13 @@ require mrfioc2_regDev
 # Initialize the reg dev to data buffer connection
 mrfiocDBuffConfigure $(EVR)DBUFF $(EVR) 1
 
-# Pass macros to the runScript command (or define them using epicsEnvSet):
+# Load records for reception. An example of ai record type is used here:
 # - OFFSET: 	 Data buffer offset to read fromread from
 # - ID: 		 A unique name for this offset
 # - PARAMS:		 Parameters to pass to regDev. For details about the parameters check regDev documentation
-# - RECORD_TYPE: Type of the EPICS record. Currently only 'ai' is supported.
 # - SYS: 		 system name
 # - EVR: 		 event receiver card name (default: EVR0)
 #
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_Rx.cmd, "ID=PULSEID, 	OFFSET=0x08, PARAMS=T=UINT32"
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_Rx.cmd, "ID=SEC, 		OFFSET=0x10, PARAMS=T=UINT32"
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_Rx.cmd, "ID=NSEC, 	OFFSET=0x14, PARAMS=T=UINT32"
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=PULSEID, OFFSET=0x10,PARAMS=T=double")
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=SEC,     OFFSET=0x18,PARAMS=T=UINT32")
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=NSEC,    OFFSET=0x1C,PARAMS=T=UINT32")
