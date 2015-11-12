@@ -6,9 +6,9 @@
 #  EVGDBUFF = EVG regDev name as configured with  mrfiocDBuffConfigure() (ie EVGDBUFF)
 #  
 # Optional macros:
-#  PULSEID_OFFSET= address offset (default: 0x08)
-#  MASTSEC_OFFSET= (default: 0x10)
-#  MASTNSEC_OFFSET= (default: 0x14)
+#  PULSEID_OFFSET= address offset (default: 0x10)
+#  MASTSEC_OFFSET= (default: 0x18)
+#  MASTNSEC_OFFSET= (default: 0x1C)
 #  DUMMY= (default: 0x7F0)
 #
 # Description:
@@ -19,7 +19,7 @@
 #
 record(ao, "$(SYS)-$(EVG):BunchIdTx-I") {
   field(DTYP, "regDev")
-  field(OUT, "@$(EVGDBUFF):$(PULSEID_OFFSET=0x08) T=double")
+  field(OUT, "@$(EVGDBUFF):$(PULSEID_OFFSET=0x10) T=double")
   field(FLNK, "$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP")
 }
 
@@ -29,7 +29,7 @@ record(ao, "$(SYS)-$(EVG):BunchIdTx-I") {
 # it gives nsec of epics timestamp in RVAL  
 #
 record(ai,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP") {
-  field(DTYP,"Soft Timestamp")
+  field(DTYP,"Soft SetTimestamp")
   field(INP,"$(SYS)-$(EVG):BunchIdTx-I")
   field(TSE,"-2")
   field(FLNK,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-SEC")
@@ -39,7 +39,7 @@ record(calcout,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-SEC") {
   field(DTYP, "regDev")
   field(INPA,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP.VAL")    # master timestamp seconds
   field(CALC,"A")
-  field(OUT, "@$(EVGDBUFF):$(MASTSEC_OFFSET=0x10) T=UINT32")
+  field(OUT, "@$(EVGDBUFF):$(MASTSEC_OFFSET=0x18) T=UINT32")
   field(FLNK,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-NSEC")
 }
 
@@ -47,16 +47,17 @@ record(calcout,"$(SYS)-$(EVG):BunchIdTx-MASTER-TS-NSEC") {
   field(DTYP, "regDev")
   field(INPA,"$(SYS)-$(EVG):BunchIdTx-MASTER-TIMESTAMP.RVAL")   # master timestamp nanoseconds
   field(CALC,"A")
-  field(OUT, "@$(EVGDBUFF):$(MASTNSEC_OFFSET=0x14) T=UINT32")
-  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE")
-}
-
-
-record(ao,"$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE") {
-  field(DTYP, "regDev")
-  field(OUT, "@$(EVGDBUFF):$(DUMMY=0x7F0) T=UINT32")
+  field(OUT, "@$(EVGDBUFF):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  #field(FLNK, "$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE")
   field(FLNK, "$(SYS)-$(EVG):BunchIdTx-Flush_")
 }
+
+
+#record(ao,"$(SYS)-$(EVG):BunchIdTx-DBUF-CLOSE") {
+#  field(DTYP, "regDev")
+#  field(OUT, "@$(EVGDBUFF):$(DUMMY=0x7F0) T=UINT32")
+#  field(FLNK, "$(SYS)-$(EVG):BunchIdTx-Flush_")
+#}
 
 record(longout, "$(SYS)-$(EVG):BunchIdTx-Flush_") {
   field(DTYP, "regDev")

@@ -7,7 +7,7 @@ epicsEnvSet EVG	"EVG0"
 require mrfioc2
 ## Check mrfioc2 project for details on how to set up the event receivers and generators
 
-runScript $($(MODULE)_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$($(MODULE)_TEMPLATES)/evr_VME-300.subs"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
 
 
 ########################################
@@ -17,4 +17,4 @@ runScript $($(MODULE)_DIR)/mrfioc2_evg-VME.cmd, "EVG_SLOT=3,EVR_SUBS=$($(MODULE)
 require mrfioc2_regDev
 
 # The following command accepts macros SYS and EVG
-runScript $($(MODULE)_DIR)/mrfioc2_regDev_bunchID_Tx.cmd
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_bunchID_Tx.cmd
