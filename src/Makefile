@@ -16,7 +16,7 @@ DBD += mrfregdev.dbd
 mrfioc2_regDev_LIBS += regDev
 
 ifeq ($(OS),Windows_NT)
-mrfioc2_regDev_LIBS += evrMrm $(EPICS_BASE_IOC_LIBS)
+mrfioc2_regDev_LIBS += mrmShared $(EPICS_BASE_IOC_LIBS)
 endif
 
 #=============================

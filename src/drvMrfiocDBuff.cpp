@@ -3,14 +3,14 @@
 ** support, and with no warranty, express or implied, as to its usefulness for
 ** any purpose.
 **
-** drvMrfiocDBuff.cpp
+** drvmrfiocRegDev.cpp
 **
 ** RegDev device support for Distributed Buffer on MRF EVR and EVG cards using
 ** mrfioc2 driver.
 **
 ** -- DOCS ----------------------------------------------------------------
 ** Driver is registered via iocsh command:
-**         mrfiocDBuffConfigure <regDevName> <mrfName> <protocol ID>
+**         mrfiocRegDevConfigure <regDevName> <mrfName> <protocol ID>
 **
 **             -regDevName: name of device as seen from regDev. E.g. this
 **                         name must be the same as parameter 1 in record OUT/IN
@@ -26,7 +26,7 @@
 **                         protocols.
 **
 **
-**         example:    mrfiocDBuffConfigure EVGDBUFF EVG1 42
+**         example:    mrfiocRegDevConfigure EVGDBUFF EVG1 42
 **
 **
 ** EPICS use:
@@ -59,7 +59,7 @@
 **         the same format as in hw buffer (always BigEndian).
 **
 **
-** Device access routines mrfiocDBuff_flush, mrmEvrDataRxCB, implement
+** Device access routines mrfiocRegDev_flush, mrmEvrDataRxCB, implement
 ** correct conversions and data reconstructions. E.g. data received over PCI/
 ** PCIe will be in littleEndian, but the littleEndian conversion will be 4 bytes
 ** wide (this means that if data in HW is 76543210 the result will be 45670123)
@@ -73,36 +73,32 @@
 ** Author: Tom Slejko
 ** -------------------------------------------------------------------------*/
 
+#include <stdlib.h>
+#include <string.h>
+
 /*
  * mrfIoc2 headers
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <mrmDataBufferUser.h>
+
 /*
  *  EPICS headers
  */
 #include <iocsh.h>
 #include <drvSup.h>
-#include <epicsExport.h>
 #include <epicsEndian.h>
 #include <regDev.h>
-#include <mrmDataBufferUser.h>
-#include <mrmShared.h> // for data buffer max length
 #include <errlog.h>
+#include <epicsExport.h>
 
 /*                                        */
 /*        DEFINES                         */
 /*                                        */
 
-int drvMrfiocRegDevDebug = 0;
-epicsExportAddress(int, drvMrfiocRegDevDebug);
-
-#if defined __GNUC__ && __GNUC__ < 3
-#define dbgPrintf(args...)  if(drvMrfiocRegDevDebug) printf(args);
-#else
-#define dbgPrintf(...)  if(drvMrfiocRegDevDebug) printf(__VA_ARGS__);
-#endif
+int mrfioc2_regDevDebug = 0;
+epicsExportAddress(int, mrfioc2_regDevDebug);
+#define dbgPrintf(level,M, ...) if(mrfioc2_regDevDebug >= level) fprintf(stderr, "mrfioc_RegDev_DEBUG: (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
 #if defined __GNUC__
 #define _unused(x) x __attribute__((unused))
@@ -110,7 +106,7 @@ epicsExportAddress(int, drvMrfiocRegDevDebug);
 #define _unused(x)
 #endif
 
-#define PROTO_START 8   // offset of the protocol ID. Offset + len must be inside first data buffer segment. Mind that first 4 bytes represent delay compensation data.
+#define dataBufferOffset 16
 
 /*
  * mrfDev reg driver private
@@ -119,13 +115,12 @@ struct regDevice{
     char*                   name;            //regDevName of device
     mrmDataBufferUser*      dataBuffer;
     IOSCANPVT               ioscanpvt;
-    epicsUInt8*             rxBuffer;        //pointer to 2k rx buffer
-    epicsUInt8*             txBuffer;        //pointer to 2k tx buffer
-    epicsUInt32             proto;           //protocol ID (4 bytes)
-    //epicsStatus             receive_status;
+    epicsUInt8*             rxBuffer;       // pointer to rx buffer
+    epicsUInt8*             txBuffer;       // pointer to tx buffer
+    epicsUInt32             proto;          // protocol ID
+    size_t                  maxLength;      // underlying data buffer capacity
+    size_t                  flushOffset;    // write to [0, flushOffset] to send out the data buffer
 };
-
-epicsUInt8 buffAddr;
 
 
 /****************************************/
@@ -137,10 +132,12 @@ epicsUInt8 buffAddr;
  * Buffer will be copied and (if needed) its contents
  * will be converted into appropriate endiannes
  */
-static void mrfiocDBuff_flush(regDevice* device)
+static void mrfiocRegDev_flush(regDevice* device)
 {
     /* Copy protocol ID (big endian) */
-    //device->dataBuffer->put(PROTO_START, sizeof(device->proto), &device->proto);
+    if (device->proto != 0) {
+        device->dataBuffer->put(0, sizeof(device->proto), &device->proto);
+    }
 
     /* Send out the data */
     device->dataBuffer->send(false);
@@ -158,18 +155,18 @@ static void mrfiocDBuff_flush(regDevice* device)
 void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
     regDevice* device = (regDevice *)pvt;
 
-    /*if (device->proto != 0)
+    if (device->proto != 0)
     {
         // Extract protocol ID
         epicsUInt32 receivedProtocolID;
 
-        device->dataBuffer->get(PROTO_START, sizeof(device->proto), &receivedProtocolID);
-        dbgPrintf("mrmEvrDataRxCB %s: protocol ID = %d\n", device->name, receivedProtocolID);
+        device->dataBuffer->get(0, sizeof(device->proto), &receivedProtocolID);
+        dbgPrintf(1,"%s: protocol ID = %d\n", device->name, receivedProtocolID);
 
         if (device->proto != receivedProtocolID) return;
-    }*/
+    }
 
-    dbgPrintf("Received new DATA at %d+%d\n", updated_offset, length);
+    dbgPrintf(1,"Received new DATA at %d+%d\n", updated_offset, length);
     device->dataBuffer->get(updated_offset, length, &device->rxBuffer[updated_offset]);
 
     scanIoRequest(device->ioscanpvt);
@@ -180,9 +177,9 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
 /*            REG DEV FUNCIONS              */
 /****************************************/
 
-void mrfiocDBuff_report(regDevice* device, int _unused(level))
+void mrfiocRegDev_report(regDevice* device, int _unused(level))
 {
-    printf("%s dataBuffer max length %u\n", device->name, DataBuffer_len_max - DataBuffer_segment_length);
+    printf("%s dataBuffer max length %u\n", device->name, device->maxLength);
 }
 
 /*
@@ -191,7 +188,7 @@ void mrfiocDBuff_report(regDevice* device, int _unused(level))
  * systems) the data may need to be converted to LE. Data in rxBuffer is
  * always BE.
  */
-int mrfiocDBuff_read(
+int mrfiocRegDev_read(
         regDevice* device,
         size_t offset,
         unsigned int datalength,
@@ -201,12 +198,9 @@ int mrfiocDBuff_read(
         regDevTransferComplete _unused(callback),
         char* user)
 {
-    //TODO out of bounds check
-    //dbgPrintf("mrfiocDBuff_read %s: from %s:0x%x len: 0x%x receive_status = %d\n", user, device->name, (int)offset, (int)(datalength*nelem), device->receive_status);
-    dbgPrintf("mrfiocDBuff_read %s: from %s:0x%x len: 0x%x\n",
+    dbgPrintf(1,"%s: from %s:0x%x len: 0x%x\n",
             user, device->name, (int)offset, (int)(datalength*nelem));
 
-    //if (device->receive_status) return -1;
 
     /* Data in buffer is in big endian byte order */
     regDevCopy(datalength, nelem, &device->rxBuffer[offset], pdata, NULL, REGDEV_LE_SWAP);
@@ -214,7 +208,7 @@ int mrfiocDBuff_read(
     return 0;
 }
 
-int mrfiocDBuff_write(
+int mrfiocRegDev_write(
         regDevice* device,
         size_t offset,
         unsigned int datalength,
@@ -225,15 +219,15 @@ int mrfiocDBuff_write(
         regDevTransferComplete _unused(callback),
         char* user)
 {
-    /*
-     * We use offset <= first segment (that is illegal for normal use since it is occupied by protoID and delay compensation data)
-     * to flush the output buffer. This eliminates the need for extra record.
-     */
-    if (offset < DataBuffer_segment_length-1) {
-        mrfiocDBuff_flush(device);
+    if (offset > device->maxLength) { // out of bounds check
+        errlogPrintf("Offset %zu not in [0, %zu]\n", offset, device->maxLength);
+        return 1;
+    }
+
+    if (offset <= device->flushOffset) {
+        mrfiocRegDev_flush(device);
         return 0;
     }
-    // TODO out of bounds check
 
     /* Copy into the scratch buffer */
     /* Data in buffer is in big endian byte order */
@@ -244,26 +238,26 @@ int mrfiocDBuff_write(
 }
 
 
-IOSCANPVT mrfiocDBuff_getInIoscan(regDevice* device, size_t _unused(offset))
+IOSCANPVT mrfiocRegDev_getInIoscan(regDevice* device, size_t _unused(offset))
 {
     return device->ioscanpvt;
 }
 
 
 //RegDev device definition
-static const regDevSupport mrfiocDBuffSupport = {
-    mrfiocDBuff_report,
-    mrfiocDBuff_getInIoscan,
+static const regDevSupport mrfiocRegDevSupport = {
+    mrfiocRegDev_report,
+    mrfiocRegDev_getInIoscan,
     NULL,
-    mrfiocDBuff_read,
-    mrfiocDBuff_write
+    mrfiocRegDev_read,
+    mrfiocRegDev_write
 };
 
 
 /*
  * Initialization, this is the entry point.
  * Function is called from iocsh. Function will try
- * to find desired device (mrfName) and attach mrfiocDBuff
+ * to find desired device (mrfName) and attach mrfiocRegDev
  * support to it.
  *
  * Args:Can not find mrf device: %s
@@ -272,16 +266,16 @@ static const regDevSupport mrfiocDBuffSupport = {
  *
  */
 
-void mrfiocDBuffConfigure(const char* regDevName, const char* mrfName, int protocol)
+void mrfiocRegDevConfigure(const char* regDevName, const char* mrfName, int protocol)
 {
     if (!regDevName || !mrfName) {
-        errlogPrintf("usage: mrfiocDBuffConfigure \"regDevName\", \"mrfName\", [protocol]\n");
+        errlogPrintf("usage: mrfiocRegDevConfigure \"regDevName\", \"mrfName\", [protocol]\n");
         return;
     }
 
     //Check if device already exists:
     if (regDevFind(regDevName)) {
-        errlogPrintf("mrfiocDBuffConfigure: FATAL ERROR! device %s already exists!\n", regDevName);
+        errlogPrintf("mrfiocRegDevConfigure: FATAL ERROR! device %s already exists!\n", regDevName);
         return;
     }
 
@@ -289,7 +283,7 @@ void mrfiocDBuffConfigure(const char* regDevName, const char* mrfName, int proto
 
     device = (regDevice*) calloc(1, sizeof(regDevice) + strlen(regDevName) + 1);
     if (!device) {
-        errlogPrintf("mrfiocDBuffConfigure %s: FATAL ERROR! Out of memory!\n", regDevName);
+        errlogPrintf("mrfiocRegDevConfigure %s: FATAL ERROR! Out of memory!\n", regDevName);
         return;
     }
     device->name = (char*)(device + 1);
@@ -300,87 +294,101 @@ void mrfiocDBuffConfigure(const char* regDevName, const char* mrfName, int proto
      */
     device->dataBuffer = new mrmDataBufferUser();    // TODO where to put destructor??
 
-    if (device->dataBuffer->init(mrfName) != 0) {
-        errlogPrintf("mrfiocDBuffConfigure %s: FAILED to initialize data buffer on device %s\n", regDevName, mrfName);
+    if (device->dataBuffer->init(mrfName, dataBufferOffset, true) != 0) {
+        errlogPrintf("mrfiocRegDevConfigure %s: FAILED to initialize data buffer on device %s\n", regDevName, mrfName);
         delete device->dataBuffer;
         return;
     }
 
-    epicsUInt32 maxLength = DataBuffer_len_max;
+    device->maxLength = device->dataBuffer->getMaxLength();
 
+
+    /*
+     * We use offset <= protoID length (that is illegal for normal use)
+     * to flush the output buffer. This eliminates the need for extra record.
+     * If protocols are disabled, offset 0 is used.
+     */
     device->proto = (epicsUInt32) protocol; //protocol ID
-    epicsPrintf("mrfiocDBuffConfigure %s: registering to protocol %d\n", regDevName, device->proto);
+
+    if (device->proto != 0) {
+        epicsPrintf("mrfiocRegDevConfigure %s: registering to protocol %d\n", regDevName, device->proto);
+        device->flushOffset = sizeof(device->proto) -1;
+    }
+    else {
+        epicsPrintf("mrfiocRegDevConfigure %s: not using protocol\n", regDevName);
+        device->flushOffset = 0;
+    }
 
     if (device->dataBuffer->supportsTx())
     {
-        dbgPrintf("mrfiocDBuffConfigure %s: %s supports TX buffer. Allocating.\n",
+        dbgPrintf(1,"%s: %s supports TX buffer. Allocating.\n",
             regDevName, mrfName);
         // Allocate the buffer memory
-        device->txBuffer = (epicsUInt8*) calloc(1, maxLength);
+        device->txBuffer = (epicsUInt8*) calloc(1, device->maxLength);
         if (!device->txBuffer) {
-            errlogPrintf("mrfiocDBuffConfigure %s: FATAL ERROR! Could not allocate TX buffer!", regDevName);
+            errlogPrintf("%s: FATAL ERROR! Could not allocate TX buffer!", regDevName);
             return;
         }
     }
 
     if (device->dataBuffer->supportsRx())
     {
-        dbgPrintf("mrfiocDBuffConfigure %s: %s supports RX buffer. Allocating and installing callback\n",
+        dbgPrintf(1,"%s: %s supports RX buffer. Allocating and installing callback\n",
             regDevName, mrfName);
-        device->rxBuffer = (epicsUInt8*) calloc(1, maxLength);
+        device->rxBuffer = (epicsUInt8*) calloc(1, device->maxLength);
         if (!device->rxBuffer) {
-            errlogPrintf("mrfiocDBuffConfigure %s: FATAL ERROR! Could not allocate RX buffer!", regDevName);
+            errlogPrintf("%s: FATAL ERROR! Could not allocate RX buffer!", regDevName);
             return;
         }
-        device->dataBuffer->registerInterest(DataBuffer_segment_length, maxLength-DataBuffer_segment_length, mrmEvrDataRxCB, device);
+        device->dataBuffer->registerInterest(0, device->maxLength, mrmEvrDataRxCB, device);
         scanIoInit(&device->ioscanpvt);
     }
 
-    regDevRegisterDevice(regDevName, &mrfiocDBuffSupport, device, maxLength);
+    regDevRegisterDevice(regDevName, &mrfiocRegDevSupport, device, device->maxLength);
 }
 
 /****************************************/
 /*        EPICS IOCSH REGISTRATION        */
 /****************************************/
 
-/*         mrfiocDBuffConfigure           */
-static const iocshArg mrfiocDBuffConfigureDefArg0 = { "regDevName", iocshArgString};
-static const iocshArg mrfiocDBuffConfigureDefArg1 = { "mrfioc2 device name", iocshArgString};
-static const iocshArg mrfiocDBuffConfigureDefArg2 = { "protocol", iocshArgInt};
-static const iocshArg *const mrfiocDBuffConfigureDefArgs[3] = {&mrfiocDBuffConfigureDefArg0, &mrfiocDBuffConfigureDefArg1, &mrfiocDBuffConfigureDefArg2};
+/*         mrfiocRegDevConfigure           */
+static const iocshArg mrfiocRegDevConfigureDefArg0 = { "regDevName", iocshArgString};
+static const iocshArg mrfiocRegDevConfigureDefArg1 = { "mrfioc2 device name", iocshArgString};
+static const iocshArg mrfiocRegDevConfigureDefArg2 = { "protocol", iocshArgInt};
+static const iocshArg *const mrfiocRegDevConfigureDefArgs[3] = {&mrfiocRegDevConfigureDefArg0, &mrfiocRegDevConfigureDefArg1, &mrfiocRegDevConfigureDefArg2};
 
-static const iocshFuncDef mrfiocDBuffConfigureDef = {"mrfiocDBuffConfigure", 3, mrfiocDBuffConfigureDefArgs};
+static const iocshFuncDef mrfiocRegDevConfigureDef = {"mrfiocRegDevConfigure", 3, mrfiocRegDevConfigureDefArgs};
 
-static void mrfioDBuffConfigureFunc(const iocshArgBuf* args) {
-    mrfiocDBuffConfigure(args[0].sval, args[1].sval, args[2].ival);
+static void mrfiocRegDevConfigureFunc(const iocshArgBuf* args) {
+    mrfiocRegDevConfigure(args[0].sval, args[1].sval, args[2].ival);
 }
 
 
-/*         mrfiocDBuffFlush           */
-static const iocshArg mrfiocDBuffFlushDefArg0 = { "regDevName", iocshArgString};
-static const iocshArg *const mrfiocDBuffFlushDefArgs[1] = {&mrfiocDBuffFlushDefArg0};
+/*         mrfiocRegDevFlush           */
+static const iocshArg mrfiocRegDevFlushDefArg0 = { "regDevName", iocshArgString};
+static const iocshArg *const mrfiocRegDevFlushDefArgs[1] = {&mrfiocRegDevFlushDefArg0};
 
-static const iocshFuncDef mrfiocDBuffFlushDef = {"mrfiocDBuffFlush", 1, mrfiocDBuffFlushDefArgs};
+static const iocshFuncDef mrfiocRegDevFlushDef = {"mrfiocRegDevFlush", 1, mrfiocRegDevFlushDefArgs};
 
-static void mrfioDBuffFlushFunc(const iocshArgBuf* args) {
+static void mrfiocRegDevFlushFunc(const iocshArgBuf* args) {
     regDevice* device = regDevFind(args[0].sval);
     if(!device){
         errlogPrintf("Can not find device: %s\n", args[0].sval);
         return;
     }
 
-    mrfiocDBuff_flush(device);
+    mrfiocRegDev_flush(device);
 }
 
 /*        registrar            */
 
-static int mrfiocDBuffRegistrar(void) {
-    iocshRegister(&mrfiocDBuffConfigureDef, mrfioDBuffConfigureFunc);
-    iocshRegister(&mrfiocDBuffFlushDef, mrfioDBuffFlushFunc);
+static int mrfiocRegDevRegistrar(void) {
+    iocshRegister(&mrfiocRegDevConfigureDef, mrfiocRegDevConfigureFunc);
+    iocshRegister(&mrfiocRegDevFlushDef, mrfiocRegDevFlushFunc);
 
     return 1;
 }
 extern "C" {
- epicsExportRegistrar(mrfiocDBuffRegistrar);
+ epicsExportRegistrar(mrfiocRegDevRegistrar);
 }
-static int done = mrfiocDBuffRegistrar();
+static int done = mrfiocRegDevRegistrar();

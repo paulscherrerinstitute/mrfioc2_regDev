@@ -17,7 +17,7 @@ runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfi
 require mrfioc2_regDev
 
 # Initialize the reg dev to data buffer connection
-mrfiocDBuffConfigure $(EVR)DBUFF $(EVR) 1
+mrfiocRegDevConfigure $(EVR)DBUFF $(EVR) 1
 
 # Load records for reception. An example of ai record type is used here:
 # - OFFSET: 	 Data buffer offset to read fromread from
