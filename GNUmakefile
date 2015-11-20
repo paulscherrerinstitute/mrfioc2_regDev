@@ -9,9 +9,9 @@ EXCLUDE_VERSIONS=3.13 3.14.8
 ARCH_FILTER=eldk52-e500v2 eldk42-ppc4xxFP SL%
 #ARCH_FILTER=eldk52-e500v2
 
-SOURCES += src/drvMrfiocDBuff.cpp
+SOURCES += src/mrfioc2_regDev.cpp
 
-DBDS += src/mrfregdev.dbd
+DBDS += src/mrfioc2_regDev.dbd
 
 TEMPLATES += templates/bunchId_Rx.template
 TEMPLATES += templates/bunchId_Tx.template
