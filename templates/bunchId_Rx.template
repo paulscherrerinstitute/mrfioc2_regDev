@@ -33,6 +33,7 @@ record(calcout,"$(SYS)-$(EVR):BunchIdRx-jump-counter") {
   field(OOPT,"When Non-zero")
   field(DOPT,"Use OCAL")
   field(PRIO, "HIGH")
+  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-DIFF-CURR_")
 }
 
 record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-SEC") {
@@ -78,24 +79,37 @@ record(calcout,"$(SYS)-$(EVR):BunchIdRx-DUMMY-FROM-TSEL") {
   field(CALC,"A+1")
   field(TSEL,"$(SYS)-$(EVR):BunchIdRx-SET-TIMESTAMP.TIME")
   field(PRIO, "HIGH")
-  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-TS-1")
 }
 
 #### measures time interval between pulse ID arraivals ###
-record(ai,"$(SYS)-$(EVR):BunchIdRx-TS-1") {
+record(ai,"$(SYS)-$(EVR):BunchIdRx-DIFF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
-  field(PRIO, "HIGH")
-  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-DIFF-I")
 }
 
-record(calcout,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF") {         
-  field(INPA,"$(SYS)-$(EVR):BunchIdRx-TS-1")
-  field(INPB,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF")
-  field(INPC,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF.OVAL")
-  field(CALC,"A")
-  field(OCAL,"B=0?0:(A-B)>C?A-B:C")
-  field(DOPT,"Use OCAL")
-  field(PREC,"4")
-  field(PRIO, "HIGH")
+##Time from previous in us
+record(calc,"$(SYS)-$(EVR):BunchIdRx-DIFF-I"){
+  field(INPA,"$(SYS)-$(EVR):BunchIdRx-DIFF-CURR_ NPP")
+  field(INPB,"$(SYS)-$(EVR):BunchIdRx-DIFF-DIFF_PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-DIFF-DIFF_PREV_")
+}
+
+record(ai, "$(SYS)-$(EVR):BunchIdRx-DIFF-DIFF_PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(SYS)-$(EVR):BunchIdRx-DIFF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-DIFF-MAX-I")
+}
+
+
+record(calc,"$(SYS)-$(EVR):BunchIdRx-DIFF-MAX-I"){
+  field(INPA,"$(SYS)-$(EVR):BunchIdRx-DIFF-I NPP")
+  field(INPB,"$(SYS)-$(EVR):BunchIdRx-DIFF-MAX-I NPP")
+  field(CALC,"A > B ? A : B")
+  field(PREC,"9")
+  field(EGU, "ms")
 }

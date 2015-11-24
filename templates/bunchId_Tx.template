@@ -63,7 +63,7 @@ record(longout, "$(SYS)-$(EVG):BunchIdTx-Flush_") {
   field(DTYP, "regDev")
   field(OUT, "@$(EVGDBUFF):0x0")
   field(VAL, "1")
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-TS-1")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_")
 }
 
 record(calcout, "$(SYS)-$(EVG):BunchIdTx_") {
@@ -84,18 +84,34 @@ record(calcout,"$(SYS)-$(EVG):BunchIdTx-jump-counter") {
 }
 
 #### measures time interval between pulse ID arraivals ###
-record(ai,"$(SYS)-$(EVG):BunchIdTx-TS-1") {
+record(ai,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-I")
 }
 
-record(calcout,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF") {         
-  field(INPA,"$(SYS)-$(EVG):BunchIdTx-TS-1")
-  field(INPB,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF")
-  field(INPC,"$(SYS)-$(EVG):BunchIdTx-TS-DIFF.OVAL")
-  field(CALC,"A")
-  field(OCAL,"B=0?0:(A-B)>C?A-B:C")
-  field(DOPT,"Use OCAL")
-  field(PREC,"4")
+##Time from previous in us
+record(calc,"$(SYS)-$(EVG):BunchIdTx-DIFF-I"){
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_ NPP")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_")
+}
+
+record(ai, "$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I")
+}
+
+
+record(calc,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I"){
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-DIFF-I NPP")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I NPP")
+  field(CALC,"A > B ? A : B")
+  field(PREC,"9")
+  field(EGU, "ms")
 }

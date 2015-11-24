@@ -281,8 +281,8 @@ static const regDevSupport mrfioc2_regDevSupport = {
  *         regDevName - desired name of the regDev device
  *         mrfName - name of mrfioc2 device (evg, evr, ...)
  *         protocol - protocol ID to use, or 0 to disable it. When not provided defaults to 0.
- *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
+ *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  */
 
 void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int argc, char** argv)
@@ -331,8 +331,8 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
 
     // set up user offset
     size_t userOffset = dataBuffer_userOffset;
-    if (argc > 3) {
-        userOffset = strtoimax(argv[3], NULL, 10);
+    if (argc > 2) {
+        userOffset = strtoimax(argv[2], NULL, 10);
         if (userOffset <= 0 || userOffset >= device->dataBufferUser->getMaxLength()) {
             userOffset = dataBuffer_userOffset;
             errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [1, %zu]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
@@ -349,8 +349,8 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     // Set max length we are interested in
     device->maxLength = device->dataBufferUser->getMaxLength();
     size_t maxLength;
-    if (argc > 2) {
-        maxLength = strtoimax(argv[2], NULL, 10);
+    if (argc > 3) {
+        maxLength = strtoimax(argv[3], NULL, 10);
         if (maxLength <= 0 || maxLength > device->maxLength) {
             device->maxLength = device->dataBufferUser->getMaxLength();
             errlogPrintf("mrfioc2_regDevConfigure %s: Maximum data length not a number or out of range: [1, %zu]\n", regDevName, device->maxLength);
@@ -388,7 +388,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
 /*         mrfioc2_regDevConfigure           */
 static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "regDevName", iocshArgString};
 static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "mrfioc2 device name", iocshArgString};
-static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "misc", iocshArgArgv}; // protocol, max interested length, user offset
+static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "misc", iocshArgArgv}; // protocol, user offset, max interested length
 static const iocshArg *const mrfioc2_regDevConfigureDefArgs[3] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2};
 
 static const iocshFuncDef mrfioc2_regDevConfigureDef = {"mrfioc2_regDevConfigure", 3, mrfioc2_regDevConfigureDefArgs};
