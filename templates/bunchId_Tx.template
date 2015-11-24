@@ -63,7 +63,7 @@ record(longout, "$(SYS)-$(EVG):BunchIdTx-Flush_") {
   field(DTYP, "regDev")
   field(OUT, "@$(EVGDBUFF):0x0")
   field(VAL, "1")
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-PERF-CURR_")
 }
 
 record(calcout, "$(SYS)-$(EVG):BunchIdTx_") {
@@ -84,34 +84,34 @@ record(calcout,"$(SYS)-$(EVG):BunchIdTx-jump-counter") {
 }
 
 #### measures time interval between pulse ID arraivals ###
-record(ai,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_") {
+record(ai,"$(SYS)-$(EVG):BunchIdTx-PERF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
   field(PRIO,"HIGH")
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-I")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-PERF-I")
 }
 
 ##Time from previous in us
-record(calc,"$(SYS)-$(EVG):BunchIdTx-DIFF-I"){
-  field(INPA,"$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_ NPP")
-  field(INPB,"$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_ NPP")
+record(calc,"$(SYS)-$(EVG):BunchIdTx-PERF-I"){
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-PERF-CURR_ NPP")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-PERF-PERF_PREV_ NPP")
   field(CALC,"(A-B)*1000")
   field(PREC,"9")
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-PERF-PERF_PREV_")
 }
 
-record(ai, "$(SYS)-$(EVG):BunchIdTx-DIFF-DIFF_PREV_"){
+record(ai, "$(SYS)-$(EVG):BunchIdTx-PERF-PERF_PREV_"){
   field(DESC,"Performance meas previous time")
-  field(INP, "$(SYS)-$(EVG):BunchIdTx-DIFF-CURR_ NPP")
+  field(INP, "$(SYS)-$(EVG):BunchIdTx-PERF-CURR_ NPP")
   field(PREC,"9" )
-  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I")
+  field(FLNK,"$(SYS)-$(EVG):BunchIdTx-PERF-MAX-I")
 }
 
 
-record(calc,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I"){
-  field(INPA,"$(SYS)-$(EVG):BunchIdTx-DIFF-I NPP")
-  field(INPB,"$(SYS)-$(EVG):BunchIdTx-DIFF-MAX-I NPP")
-  field(CALC,"A > B ? A : B")
+record(calc,"$(SYS)-$(EVG):BunchIdTx-PERF-MAX-I"){
+  field(INPA,"$(SYS)-$(EVG):BunchIdTx-PERF-I NPP")
+  field(INPB,"$(SYS)-$(EVG):BunchIdTx-PERF-MAX-I NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
   field(PREC,"9")
   field(EGU, "ms")
 }
