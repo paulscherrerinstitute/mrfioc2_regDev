@@ -3,21 +3,24 @@
 ** support, and with no warranty, express or implied, as to its usefulness for
 ** any purpose.
 **
-** drvmrfioc2_regDev.cpp
+** mrfioc2_regDev.cpp
 **
 ** RegDev device support for Distributed Buffer on MRF EVR and EVG cards using
 ** mrfioc2 driver.
 **
 ** -- DOCS ----------------------------------------------------------------
 ** Driver is registered via iocsh command:
-**         mrfioc2_regDevConfigure <regDevName> <mrfName> <protocol ID>
+**         mrfioc2_regDevConfigure <regDevName> <mrfName> <protocol ID> <userOffset> <maxLength>
 **
 **             -regDevName: name of device as seen from regDev. E.g. this
 **                         name must be the same as parameter 1 in record OUT/IN
 **
 **             -mrfName: name of mrf device
 **
-**             -protocol ID: protocol id (32 bit int). If set to 0, than receiver
+**             -protocol ID: protocol id (32 bit int). Useful when using 230 series
+**                         hardware. 300 series uses segmented data buffer, which
+**                         makes the protocol ID redundant.
+**                         If protocol ID is set to 0, than receiver
 **                         will accept all buffers. This is useful for
 **                         debugging. If protocol != 0 then only received buffers
 **                         with same protocol id are accepted. If you need to work
@@ -25,8 +28,11 @@
 **                         of regDev using the same mrfName but different regDevNames and
 **                         protocols.
 **
+**             -userOffset: offset from the start of the data buffer that we are using. When not provided defaults to 16.
+**             -maxLength: maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
 **
-**         example:    mrfioc2_regDevConfigure EVGDBUFF EVG1 42
+**
+**         example:    mrfioc2_regDevConfigure EVGDBUFF EVG0 0 16 32
 **
 **
 ** EPICS use:
@@ -47,6 +53,9 @@
 ** PCI EVR-230 (rx only, firmware version 3 does not support databuffer tx)
 ** PCIe EVR-300 (tx and rx)
 **
+** VME EVM-300 (tx and rx)
+** VME EVR-300 (tx and rx)
+**
 **
 ** -- IMPLEMENTATION ---------------------------------------------------------
 **
@@ -65,9 +74,6 @@
 ** wide (this means that if data in HW is 76543210 the result will be 45670123)
 **
 **
-** -- MISSING ---------------------------------------------------------------
-**
-** Explicit setting of DataBuffer MODE (whether DataBuffer is shared with DBUS)
 **
 **
 ** Author: Tom Slejko
@@ -148,6 +154,7 @@ static void mrfioc2_regDev_flush(regDevice* device)
 
     /* Send out the data */
     device->dataBufferUser->send(false);
+    dbgPrintf(2,"Flushed\n");
 }
 
 
@@ -174,12 +181,18 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
 void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
     printf("mrfioc2 regDev: %s\n\t" \
            "Max length: %zu\n\t" \
-           "Invalid offsets: [1, %zu]\n\t" \
            "Protocol ID: %u\n\t" \
            "Supports transmission: %s\n\t" \
-           "Supports reception: %s\n",
-           device->name, device->maxLength, device->invalidOffset, device->proto,
+           "Supports reception: %s\n\t",
+           device->name, device->maxLength, device->proto,
            device->dataBufferUser->supportsTx() ? "yes":"no", device->dataBufferUser->supportsRx() ? "yes":"no");
+
+    if(device->invalidOffset > 0) {
+        printf("Invalid offsets: [1, %zu]\n", device->invalidOffset);
+    }else {
+        printf("Invalid offsets: none\n");
+    }
+
 }
 
 /*
@@ -202,7 +215,7 @@ int mrfioc2_regDev_read(
         regDevTransferComplete _unused(callback),
         char* user)
 {
-    dbgPrintf(2,"%s: from %s:0x%x len: 0x%x\n",  user, device->name, (int)offset, (int)(datalength*nelem));
+    dbgPrintf(3,"%s: from %s:0x%x len: 0x%x\n",  user, device->name, (int)offset, (int)(datalength*nelem));
 
     epicsUInt32 receivedProtocolID = 0;
 
@@ -214,7 +227,7 @@ int mrfioc2_regDev_read(
     regDevCopy(datalength, nelem, &device->rxBuffer[offset], pdata, NULL, REGDEV_LE_SWAP);  // Copy received data to the record
     device->dataBufferUser->releaseRxBuffer();
 
-    if (device->proto != 0) dbgPrintf(2,"%s: protocol ID = %d\n", device->name, receivedProtocolID);
+    if (device->proto != 0) dbgPrintf(3,"%s: protocol ID = %d\n", device->name, receivedProtocolID);
 
     return 0;
 }
@@ -322,8 +335,8 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
         device->proto = (epicsUInt32) strtoimax(argv[1], NULL, 10);
     }
     if (device->proto != 0) {
-        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %d\n", regDevName, device->proto);
         device->invalidOffset = sizeof(device->proto) -1;
+        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %d.\n\tInvalid write offsets: [1, %zu]\n", regDevName, device->proto, device->invalidOffset);
     } else {
         dbgPrintf(1,"mrfioc2_regDevConfigure %s: Not using protocol number (set to 0)\n", regDevName);
         device->invalidOffset = 0;
