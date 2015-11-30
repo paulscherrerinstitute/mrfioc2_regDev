@@ -346,9 +346,9 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     size_t userOffset = dataBuffer_userOffset;
     if (argc > 2) {
         userOffset = strtoimax(argv[2], NULL, 10);
-        if (userOffset <= 0 || userOffset >= device->dataBufferUser->getMaxLength()) {
+        if (userOffset < 0 || userOffset >= device->dataBufferUser->getMaxLength()) {
             userOffset = dataBuffer_userOffset;
-            errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [1, %zu]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
+            errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [0, %zu]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
         }
     }
     dbgPrintf(1,"%s: User offset set to %d\n", regDevName, userOffset);

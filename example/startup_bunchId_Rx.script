@@ -1,5 +1,7 @@
+## In this example we are using reception function on the event receiver
+
 epicsEnvSet SYS "FTEST-VME-BUNCHRXTST"
-epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
+
 
 ##########################
 #-----! EVR Setup ------!#
@@ -7,8 +9,7 @@ epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
 require mrfioc2
 ## Check mrfioc2 project for details on how to set up the event receivers and generators
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
-
+runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "EVR=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
 
 ########################################
 #------! Bunch ID receive setup ------!#
@@ -16,5 +17,12 @@ runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfi
 # The require command accepts macros EVR or EVG
 require mrfioc2_regDev
 
-# The following command accepts macros SYS and EVR
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_bunchID_Rx.cmd
+# The following macros are available to set up the mrfioc2 regDev:
+# SYS 			is used as a prefix for all records. In this example it is set at the beginning using 'epicsEnvSet'
+# DEVICE 		is the event receiver or event generator card name. (default: EVR0)
+# NAME 			is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUFF == EVR0DBUFF
+# PROTOCOL 		Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols. (default: 0)
+# USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
+# MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
+
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_bunchID_Rx.cmd, "DEVICE=EVR0"
