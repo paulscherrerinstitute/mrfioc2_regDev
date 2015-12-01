@@ -327,7 +327,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     /*
      * Create new data buffer user and fill device (regDevice)
      */
-    device->dataBufferUser = new mrmDataBufferUser();    // TODO where to put destructor??
+    device->dataBufferUser = new mrmDataBufferUser();    // we only destroy this object on error, never in normal operation.
 
     // Set up protocol number
     device->proto = 0;
@@ -347,8 +347,9 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     if (argc > 2) {
         userOffset = strtoimax(argv[2], NULL, 10);
         if (userOffset < 0 || userOffset >= device->dataBufferUser->getMaxLength()) {
-            userOffset = dataBuffer_userOffset;
             errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [0, %zu]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
+            delete device->dataBufferUser;
+            return;
         }
     }
     dbgPrintf(1,"%s: User offset set to %d\n", regDevName, userOffset);
@@ -365,8 +366,9 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     if (argc > 3) {
         maxLength = strtoimax(argv[3], NULL, 10);
         if (maxLength <= 0 || maxLength > device->maxLength) {
-            device->maxLength = device->dataBufferUser->getMaxLength();
             errlogPrintf("mrfioc2_regDevConfigure %s: Maximum data length not a number or out of range: [1, %zu]\n", regDevName, device->maxLength);
+            delete device->dataBufferUser;
+            return;
         }
         else device->maxLength = maxLength;
     }
