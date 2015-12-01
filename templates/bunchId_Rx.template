@@ -3,7 +3,7 @@
 # Mandatory macros:
 #  SYS = System name (ie FIN)
 #  DEVICE = Device name (ie EVR0)
-#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUFF)
+#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUF)
 #  
 # Optional macros:
 #  PULSEID_OFFSET = address offset (0x10)
