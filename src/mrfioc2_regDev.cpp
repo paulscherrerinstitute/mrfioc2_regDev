@@ -10,20 +10,20 @@
 **
 ** -- DOCS ----------------------------------------------------------------
 ** Driver is registered via iocsh command:
-**         mrfioc2_regDevConfigure <regDev_name> <mrfioc2_device_name> <protocol ID> <userOffset> <maxLength>
+**         mrfioc2_regDevConfigure <name> <device> <protocol> <userOffset> <maxLength>
 **
-**             -regDev_name: name of device as seen from regDev. E.g. this
+**             -name: name of device as seen from regDev. E.g. this
 **                         name must be the same as parameter 1 in record OUT/IN
 **
-**             -mrfioc2_device_name: name of mrf device
+**             -device: name of timing card (EVG0, EVR0, EVR1, ...)
 **
-**             -protocol ID: protocol id (32 bit int). Useful when using 230 series
+**             -protocol: protocol (32 bit int). Useful when using 230 series
 **                         hardware. 300 series uses segmented data buffer, which
-**                         makes the protocol ID redundant.
-**                         If protocol ID is set to 0, than receiver
+**                         makes the protocol redundant.
+**                         If protocol is set to 0, than receiver
 **                         will accept all buffers. This is useful for
 **                         debugging. If protocol != 0 then only received buffers
-**                         with same protocol id are accepted. If you need to work
+**                         with same protocol are accepted. If you need to work
 **                         with multiple protocols you can register multiple instances
 **                         of regDev using the same mrfName but different regDevNames and
 **                         protocols.
@@ -39,7 +39,7 @@
 **
 **         - records behave the same as for any other regDev device with one exception:
 **
-**         - when using protocol ID, offset 0x00-0x04 can not be written to (because size of protocol ID is 4 bytes)
+**         - when using protocol, offset 0x00-0x04 can not be written to (because size of protocol is 4 bytes)
 **         - writing to offset 0x00 will flush the buffer
 **         - input records are automatically processed (if scan == IO) when a valid buffer is received
 **
@@ -122,9 +122,9 @@ struct regDevice{
     IOSCANPVT               ioscanpvt;
     epicsUInt8*             rxBuffer;       // pointer to rx buffer
     epicsUInt8*             txBuffer;       // pointer to tx buffer
-    epicsUInt32             protocolID;     // protocol ID
+    epicsUInt32             protocol;       // protocol ID
     size_t                  maxLength;      // underlying data buffer capacity
-    size_t                  invalidOffset;  // writing to [0, invalidOffset] fails. The offset is dependant on protocol ID (its size, and if it is used or not)
+    size_t                  invalidOffset;  // writing to [0, invalidOffset] fails. The offset is dependant on protocol (its size, and if it is used or not)
 };
 
 
@@ -134,15 +134,15 @@ struct regDevice{
 
 /*
  * Function will flush software scratch buffer.
- * If protocol ID is used it is send out too.
+ * If protocol is used it is send out too.
  */
 static void mrfioc2_regDev_flush(regDevice* device)
 {
-    /* Copy protocol ID (big endian) */
-    if (device->protocolID != 0) {
+    /* Copy protocol (big endian) */
+    if (device->protocol != 0) {
         device->txBuffer = device->dataBufferUser->requestTxBuffer();
-        regDevCopy(sizeof(device->protocolID), 1, &device->protocolID, &device->txBuffer[0], NULL, REGDEV_LE_SWAP);  // Extract protocol ID
-        device->dataBufferUser->releaseTxBuffer(0, sizeof(device->protocolID));
+        regDevCopy(sizeof(device->protocol), 1, &device->protocol, &device->txBuffer[0], NULL, REGDEV_LE_SWAP);  // Extract protocol
+        device->dataBufferUser->releaseTxBuffer(0, sizeof(device->protocol));
     }
 
     /* Send out the data */
@@ -171,10 +171,10 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
 void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
     printf("mrfioc2 regDev: %s\n\t" \
            "Max length: %zu\n\t" \
-           "Protocol ID: %u\n\t" \
+           "protocol: %u\n\t" \
            "Supports transmission: %s\n\t" \
            "Supports reception: %s\n\t",
-           device->name, device->maxLength, device->protocolID,
+           device->name, device->maxLength, device->protocol,
            device->dataBufferUser->supportsTx() ? "yes":"no", device->dataBufferUser->supportsRx() ? "yes":"no");
 
     if(device->invalidOffset > 0) {
@@ -190,7 +190,7 @@ void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
  * Since data in MRF DBUF is big endian (since all EVGs are running on BE
  * systems) the data may need to be converted to LE.
  *
- * If protocol ID is used, we compare the received protocol ID
+ * If protocol is used, we compare the received protocol
  * with desired protocol. If there is a match then the data is copied into the record.
  *
  */
@@ -206,13 +206,13 @@ int mrfioc2_regDev_read(
 {
     dbgPrintf(3,"%s: from %s:0x%x len: 0x%x\n",  user, device->name, (int)offset, (int)(datalength*nelem));
 
-    epicsUInt32 receivedProtocolID = 0;
+    epicsUInt32 receivedProtocol = 0;
 
     device->rxBuffer = device->dataBufferUser->requestRxBuffer();
-    if (device->protocolID != 0) {
-        regDevCopy(sizeof(device->protocolID), 1, device->rxBuffer, &receivedProtocolID, NULL, REGDEV_LE_SWAP);  // Extract protocol ID
+    if (device->protocol != 0) {
+        regDevCopy(sizeof(device->protocol), 1, device->rxBuffer, &receivedProtocol, NULL, REGDEV_LE_SWAP);  // Extract protocol
 
-        if (device->protocolID != receivedProtocolID) { // Do nothing if we are not interested in this protocol ID
+        if (device->protocol != receivedProtocol) { // Do nothing if we are not interested in this protocol
             device->dataBufferUser->releaseRxBuffer();
             return 0;
         }
@@ -220,7 +220,7 @@ int mrfioc2_regDev_read(
     regDevCopy(datalength, nelem, &device->rxBuffer[offset], pdata, NULL, REGDEV_LE_SWAP);  // Copy received data to the record
     device->dataBufferUser->releaseRxBuffer();
 
-    if (device->protocolID != 0) dbgPrintf(3,"%s: protocol ID = %d\n", device->name, receivedProtocolID);
+    if (device->protocol != 0) dbgPrintf(3,"%s: protocol = %d\n", device->name, receivedProtocol);
 
     return 0;
 }
@@ -284,9 +284,9 @@ static const regDevSupport mrfioc2_regDevSupport = {
  * support to it.
  *
  * Args:Can not find mrf device: %s
- *         regDev_name - desired name of the regDev device
- *         mrfioc2_device_name - name of mrfioc2 device (evg, evr, ...)
- *         protocol - protocol ID to use, or 0 to disable it. When not provided defaults to 0.
+ *         name - desired name of the regDev device
+ *         device - name of mrfioc2 device (evg, evr, ...)
+ *         protocol - protocol to use, or 0 to disable it. When not provided defaults to 0.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
  *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  */
@@ -294,7 +294,7 @@ static const regDevSupport mrfioc2_regDevSupport = {
 void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int argc, char** argv)
 {
     if (!regDevName || !mrfName) {
-        errlogPrintf("usage: mrfioc2_regDevConfigure \"regDev_name\", \"mrfioc2_device_name\", [protocol] [userOffset] [maxLength]\n");
+        errlogPrintf("usage: mrfioc2_regDevConfigure \"name\", \"device\", [protocol] [userOffset] [maxLength]\n");
         return;
     }
 
@@ -305,7 +305,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     }
 
     /*
-     * Init regDevice structure and fill it with regDev_name
+     * Init regDevice structure and fill it with name
      */
     regDevice* device;
     device = (regDevice*) calloc(1, sizeof(regDevice) + strlen(regDevName) + 1);
@@ -323,13 +323,13 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     device->dataBufferUser = new mrmDataBufferUser();    // we only destroy this object on error, never in normal operation.
 
     // Set up protocol number
-    device->protocolID = 0;
+    device->protocol = 0;
     if (argc > 1) {
-        device->protocolID = (epicsUInt32) strtoimax(argv[1], NULL, 10);
+        device->protocol = (epicsUInt32) strtoimax(argv[1], NULL, 10);
     }
-    if (device->protocolID != 0) {
-        device->invalidOffset = sizeof(device->protocolID) -1;
-        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %d.\n\tInvalid write offsets: [1, %zu]\n", regDevName, device->protocolID, device->invalidOffset);
+    if (device->protocol != 0) {
+        device->invalidOffset = sizeof(device->protocol) -1;
+        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %d.\n\tInvalid write offsets: [1, %zu]\n", regDevName, device->protocol, device->invalidOffset);
     } else {
         dbgPrintf(1,"mrfioc2_regDevConfigure %s: Not using protocol number (set to 0)\n", regDevName);
         device->invalidOffset = 0;
@@ -394,8 +394,8 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
 /****************************************/
 
 /*         mrfioc2_regDevConfigure           */
-static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "regDev_name", iocshArgString};
-static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "mrfioc2_device_name", iocshArgString};
+static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "name", iocshArgString};
+static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "device", iocshArgString};
 static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "protocol userOffset maxLength", iocshArgArgv}; // protocol, user offset, max interested length
 static const iocshArg *const mrfioc2_regDevConfigureDefArgs[3] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2};
 
