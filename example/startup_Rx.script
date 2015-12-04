@@ -8,7 +8,7 @@ epicsEnvSet SYS "FTEST-VME-TIMING-RXTEST"
 require mrfioc2
 ## Check mrfioc2 project for details on how to set up the event receivers and generators
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "DEVICE=EVR0, EVR_SLOT=4,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
 
 
 ########################################
@@ -33,7 +33,7 @@ mrfioc2_regDevConfigure EVR0DBUFF EVR0 0 16 32
 # - ID: 		 A unique name for this offset (applies to record name)
 # - PARAMS:		 Parameters to pass to regDev. For details about the parameters check regDev documentation
 # - SYS: 		 a prefix for the created record.
-# - EVR: 		 event receiver card name.
+# - DEVICE: 	 event receiver / timing  card name.
 
 dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF, NAME=EVR0DBUFF, DEVICE=EVR0, ID=PULSEID, OFFSET=0x10, PARAMS=T=double")
 dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF, NAME=EVR0DBUFF, DEVICE=EVR0, ID=SEC,     OFFSET=0x18, PARAMS=T=UINT32")

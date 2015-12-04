@@ -285,7 +285,7 @@ static const regDevSupport mrfioc2_regDevSupport = {
  *
  * Args:Can not find mrf device: %s
  *         name - desired name of the regDev device
- *         device - name of mrfioc2 device (evg, evr, ...)
+ *         device - name of mrfioc2 device - timing card (evg, evr, ...)
  *         protocol - protocol to use, or 0 to disable it. When not provided defaults to 0.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
  *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
