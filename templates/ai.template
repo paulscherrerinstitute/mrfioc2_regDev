@@ -1,5 +1,5 @@
-record(ai, "$(SYS)-$(EV):$(ID)-RX") {
+record(ai, "$(SYS)-$(DEVICE):$(ID)-RX") {
   field(DTYP, "regDev")
-  field(INP, "@$(EV)DBUFF:$(OFFSET) $(PARAMS)")
+  field(INP, "@$(NAME):$(OFFSET) $(PARAMS)")
   field(SCAN, "I/O Intr")
 }

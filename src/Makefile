@@ -9,14 +9,14 @@ include $(TOP)/configure/CONFIG
 
 LIBRARY_IOC += mrfioc2_regDev
 RELEASE_INCLUDES += -I$(MRFIOC2)/include/dataBuffer
-mrfioc2_regDev_SRCS += drvMrfiocDBuff.cpp
+mrfioc2_regDev_SRCS += mrfioc2_regDev.cpp
 
-DBD += mrfregdev.dbd
+DBD += mrfioc2_regDev.dbd
 
 mrfioc2_regDev_LIBS += regDev
 
 ifeq ($(OS),Windows_NT)
-mrfioc2_regDev_LIBS += evrMrm $(EPICS_BASE_IOC_LIBS)
+mrfioc2_regDev_LIBS += mrmShared $(EPICS_BASE_IOC_LIBS)
 endif
 
 #=============================

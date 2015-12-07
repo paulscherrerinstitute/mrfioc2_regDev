@@ -1,5 +1,6 @@
+## In this example we are using reception function on the event receiver
+
 epicsEnvSet SYS "FTEST-VME-TIMING-RXTEST"
-epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
 
 ##########################
 #-----! EVR Setup ------!#
@@ -7,7 +8,7 @@ epicsEnvSet EVR	"EVR0"		## is the event receiver card name. (default: EVR0)
 require mrfioc2
 ## Check mrfioc2 project for details on how to set up the event receivers and generators
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "DEVICE=EVR0, EVR_SLOT=4,EVR_SUBS=$(mrfioc2_regDev_TEMPLATES)/evr_VME-300.subs"
 
 
 ########################################
@@ -17,15 +18,24 @@ runScript $(mrfioc2_regDev_DIR)/mrfioc2_evr-VME.cmd, "EVR_SLOT=4,EVR_SUBS=$(mrfi
 require mrfioc2_regDev
 
 # Initialize the reg dev to data buffer connection
-mrfiocDBuffConfigure $(EVR)DBUFF $(EVR) 1
+# Usage: mrfioc2_regDevConfigure name device protocol userOffset maxLength
+# We are setting:
+#   name = EVR0DBUFF
+#   device = EVR0
+#   protocol = do not use protocol IDs
+#   userOffset = 16
+#   maxLength = 32
 
-# Load records for reception. An example of ai record type is used here:
+mrfioc2_regDevConfigure EVR0DBUFF EVR0 0 16 32
+
+# Load records for reception. An example of ai record type is used here, which is already provided by the mrfioc2_regDev module:
 # - OFFSET: 	 Data buffer offset to read fromread from
-# - ID: 		 A unique name for this offset
+# - ID: 		 A unique name for this offset (applies to record name)
 # - PARAMS:		 Parameters to pass to regDev. For details about the parameters check regDev documentation
-# - SYS: 		 system name
-# - EVR: 		 event receiver card name (default: EVR0)
-#
-dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=PULSEID, OFFSET=0x10,PARAMS=T=double")
-dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=SEC,     OFFSET=0x18,PARAMS=T=UINT32")
-dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF,EV=$(EVR),ID=NSEC,    OFFSET=0x1C,PARAMS=T=UINT32")
+# - SYS: 		 a prefix for the created record.
+# - DEVICE: 	 event receiver / timing  card name.
+
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF, NAME=EVR0DBUFF, DEVICE=EVR0, ID=PULSEID, OFFSET=0x10, PARAMS=T=double")
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF, NAME=EVR0DBUFF, DEVICE=EVR0, ID=SEC,     OFFSET=0x18, PARAMS=T=UINT32")
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/ai.template", "SYS=$(SYS)-DBUF, NAME=EVR0DBUFF, DEVICE=EVR0, ID=NSEC,    OFFSET=0x1C, PARAMS=T=UINT32")
+

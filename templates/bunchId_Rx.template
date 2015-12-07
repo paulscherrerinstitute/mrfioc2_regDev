@@ -2,62 +2,53 @@
 #
 # Mandatory macros:
 #  SYS = System name (ie FIN)
-#  EVR = Device name (ie EVR0)
-#  EVRDBUFF = EVR regDev name as configured with  mrfiocDBuffConfigure() (ie EVRDBUFF)
+#  DEVICE = Timing card name (ie EVR0)
+#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUF)
 #  
 # Optional macros:
 #  PULSEID_OFFSET = address offset (0x10)
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
-#  DUMMYWF_OFFSET = offset for the dummy WF. (default: 0x28)
 #
 # Description:
 #
 # This database receives the bunch id via databuffer, using Tom Slejko's driver
 # (regDev).
 
-record(ai, "$(SYS)-$(EVR):BunchIdRx-I") {
+record(ai, "$(SYS)-$(DEVICE):BunchIdRx-I") {
   field(DTYP, "regDev")
-  field(INP, "@$(EVRDBUFF):$(PULSEID_OFFSET=0x10) T=double")
+  field(INP, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
   field(SCAN, "I/O Intr")
   field(PRIO, "HIGH")
-  field(FLNK, "$(SYS)-$(EVR):BunchIdRx-jump-counter")
+  field(FLNK, "$(SYS)-$(DEVICE):BunchIdRx-jump-counter")
 }
 
-record(calcout,"$(SYS)-$(EVR):BunchIdRx-jump-counter") {         
-  field(INPA,"$(SYS)-$(EVR):BunchIdRx-I")
-  field(INPB,"$(SYS)-$(EVR):BunchIdRx-jump-counter")
-  field(INPC,"$(SYS)-$(EVR):BunchIdRx-jump-counter.OVAL")
+record(calcout,"$(SYS)-$(DEVICE):BunchIdRx-jump-counter") {         
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdRx-I")
+  field(INPB,"$(SYS)-$(DEVICE):BunchIdRx-jump-counter")
+  field(INPC,"$(SYS)-$(DEVICE):BunchIdRx-jump-counter.OVAL")
   field(CALC,"A")
   field(OCAL,"A-B#1?C+1:C")
   field(OOPT,"When Non-zero")
   field(DOPT,"Use OCAL")
   field(PRIO, "HIGH")
+  field(FLNK,"$(SYS)-$(DEVICE):BunchIdRx-PERF-CURR_")
 }
 
-record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-SEC") {
+record(longin,"$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-SEC") {
   field(DTYP, "regDev")
   field(SCAN, "I/O Intr")
-  field(INP, "@$(EVRDBUFF):$(MASTSEC_OFFSET=0x18) T=UINT32")
-  field(FLNK, "$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC")
+  field(INP, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
+  field(FLNK, "$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC")
   field(PRIO, "HIGH")
 }
 
-record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC") {
+record(longin,"$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC") {
   field(DTYP, "regDev")
-  field(INP, "@$(EVRDBUFF):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  field(INP, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(SYS)-$(EVR):BunchIdRx-SET-TIMESTAMP")
+  field(FLNK, "$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP")
 }
-
-#record(waveform,"$(SYS)-$(EVR):BunchIdRx-MASTER-DUMMY-WF") {
-#  field(DTYP, "regDev")
-#  field(NELM,"500")                        
-#  field(FTVL,"ULONG")
-#  field(INP, "@$(EVRDBUFF):$(DUMMYWF_OFFSET=0x28) T=UINT32")
-#  field(SCAN, "I/O Intr")
-#  field(PRIO, "HIGH")
-#}
 
 # reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
@@ -65,37 +56,50 @@ record(longin,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC") {
 # to point to TIME fiel of this record
 # VAL and OVAL give also sec and nsec of the master in double  
 #
-record(calcout,"$(SYS)-$(EVR):BunchIdRx-SET-TIMESTAMP") {
-  field(INPA,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-SEC")
-  field(INPB,"$(SYS)-$(EVR):BunchIdRx-MASTER-TS-NSEC")
+record(calcout,"$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP") {
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-SEC")
+  field(INPB,"$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC")
   field(TSE,"-2")
   field(PRIO, "HIGH")
-  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-DUMMY-FROM-TSEL")
+  field(FLNK,"$(SYS)-$(DEVICE):BunchIdRx-DUMMY-FROM-TSEL")
 }
 
-record(calcout,"$(SYS)-$(EVR):BunchIdRx-DUMMY-FROM-TSEL") {
-  field(INPA,"$(SYS)-$(EVR):BunchIdRx-DUMMY-FROM-TSEL")
+record(calcout,"$(SYS)-$(DEVICE):BunchIdRx-DUMMY-FROM-TSEL") {
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdRx-DUMMY-FROM-TSEL")
   field(CALC,"A+1")
-  field(TSEL,"$(SYS)-$(EVR):BunchIdRx-SET-TIMESTAMP.TIME")
+  field(TSEL,"$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP.TIME")
   field(PRIO, "HIGH")
-  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-TS-1")
 }
 
 #### measures time interval between pulse ID arraivals ###
-record(ai,"$(SYS)-$(EVR):BunchIdRx-TS-1") {
+record(ai,"$(SYS)-$(DEVICE):BunchIdRx-PERF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
-  field(PRIO, "HIGH")
-  field(FLNK,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(SYS)-$(DEVICE):BunchIdRx-PERF-I")
 }
 
-record(calcout,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF") {         
-  field(INPA,"$(SYS)-$(EVR):BunchIdRx-TS-1")
-  field(INPB,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF")
-  field(INPC,"$(SYS)-$(EVR):BunchIdRx-TS-DIFF.OVAL")
-  field(CALC,"A")
-  field(OCAL,"B=0?0:(A-B)>C?A-B:C")
-  field(DOPT,"Use OCAL")
-  field(PREC,"4")
-  field(PRIO, "HIGH")
+##Time from previous in us
+record(calc,"$(SYS)-$(DEVICE):BunchIdRx-PERF-I"){
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdRx-PERF-CURR_ NPP")
+  field(INPB,"$(SYS)-$(DEVICE):BunchIdRx-PERF-PERF_PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(SYS)-$(DEVICE):BunchIdRx-PERF-PERF_PREV_")
+}
+
+record(ai, "$(SYS)-$(DEVICE):BunchIdRx-PERF-PERF_PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(SYS)-$(DEVICE):BunchIdRx-PERF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I")
+}
+
+
+record(calc,"$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I"){
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdRx-PERF-I NPP")
+  field(INPB,"$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
+  field(PREC,"9")
+  field(EGU, "ms")
 }

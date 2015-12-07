@@ -1,4 +1,4 @@
-record(ao, "$(SYS)-$(EV):$(ID)-TX") {
+record(ao, "$(SYS)-$(DEVICE):$(ID)-TX") {
   field(DTYP, "regDev")
-  field(OUT, "@$(EV)DBUFF:$(OFFSET) $(PARAMS)")
+  field(OUT, "@$(NAME):$(OFFSET) $(PARAMS)")
 }

@@ -1,0 +1,2 @@
+registrar(mrfioc2_regDevRegistrar)
+variable(mrfioc2_regDevDebug, int)
