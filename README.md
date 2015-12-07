@@ -1,5 +1,5 @@
 # mrfioc2_regDev
-[mrfioc2_regDev](https://github.psi.ch/projects/ED/repos/mrfioc2_regdev/browse) enables the user to easily access (read or write) the data buffer that is exposed in the [mrfioc2](https://github.psi.ch/projects/ED/repos/mrfioc2/browse) EPICS device support for the Micro Research Finland ([MRF](http://www.mrf.fi/)) timing system (in short mrfioc2 driver).
+[mrfioc2_regDev](https://github.psi.ch/projects/COS/repos/mrfioc2_regdev/browse) enables the user to easily access (read or write) the data buffer that is exposed in the [mrfioc2](https://github.psi.ch/projects/ED/repos/mrfioc2/browse) EPICS device support for the Micro Research Finland ([MRF](http://www.mrf.fi/)) timing system (in short mrfioc2 driver).
 
 
 
@@ -10,7 +10,7 @@
 
 
 ## Quick start (PSI)
-Access [mrfioc2_regDev](https://github.psi.ch/projects/ED/repos/mrfioc2_regdev/browse) and inspect example startup scripts:
+Access [mrfioc2_regDev](https://github.psi.ch/projects/COS/repos/mrfioc2_regdev/browse) and inspect example startup scripts:
 
 * `example/startup_bunchId_Rx.script` is an example startup script for use with bunch ID reception. 
 * `example/startup_bunchId_Tx.script` is an example startup script for use with bunch ID transmission.
