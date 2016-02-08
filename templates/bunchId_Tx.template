@@ -9,6 +9,7 @@
 #  PULSEID_OFFSET = address offset (0x10)
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
 #
 # Description:
 #
@@ -47,6 +48,14 @@ record(calcout,"$(SYS)-$(DEVICE):BunchIdTx-MASTER-TS-NSEC") {
   field(INPA,"$(SYS)-$(DEVICE):BunchIdTx-MASTER-TIMESTAMP.RVAL")   # master timestamp nanoseconds
   field(CALC,"A")
   field(OUT, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  field(FLNK, "$(SYS)-$(DEVICE):BunchIdTx-UINT-COUNTER")
+}
+
+record(calcout,"$(SYS)-$(DEVICE):BunchIdTx-UINT-COUNTER") {
+  field(DTYP, "regDev")
+  field(INPA,"$(SYS)-$(DEVICE):BunchIdTx-UINT-COUNTER.VAL")   # master 32-bits counter
+  field(CALC,"A+1")
+  field(OUT, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
   field(FLNK, "$(SYS)-$(DEVICE):BunchIdTx-Flush_")
 }
 

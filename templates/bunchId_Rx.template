@@ -9,6 +9,7 @@
 #  PULSEID_OFFSET = address offset (0x10)
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
 #
 # Description:
 #
@@ -50,7 +51,14 @@ record(longin,"$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC") {
   field(FLNK, "$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP")
 }
 
-# reads timestamp from the master SEC and NSEC
+record(longin,"$(SYS)-$(DEVICE):BunchIdRx-UINT-COUNTER") {
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
+  field(PRIO, "HIGH")
+}
+
+ reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
 # Everey record that wants timestamp of the master sets its TSEL field
 # to point to TIME fiel of this record
