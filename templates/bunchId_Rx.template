@@ -58,7 +58,7 @@ record(longin,"$(SYS)-$(DEVICE):BunchIdRx-UINT-COUNTER") {
   field(PRIO, "HIGH")
 }
 
- reads timestamp from the master SEC and NSEC
+# reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
 # Everey record that wants timestamp of the master sets its TSEL field
 # to point to TIME fiel of this record
