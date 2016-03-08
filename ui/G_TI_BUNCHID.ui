@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>690</width>
+    <height>227</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caRelatedDisplay" name="carelateddisplay">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>2</y>
+      <width>131</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="label">
+     <string notr="true">Data Buffer</string>
+    </property>
+    <property name="labels">
+     <string>1</string>
+    </property>
+    <property name="files">
+     <string>?</string>
+    </property>
+    <property name="args">
+     <string>SYS=$(SYS),DEVICE=$(DEVICE)</string>
+    </property>
+    <property name="stackingMode" stdset="0">
+     <enum>caRowColMenu::Menu</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>40</y>
+      <width>331</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>5</y>
+       <width>311</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string> Timestamp </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <widget class="caLineEdit" name="calineedit_7">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>140</y>
+        <width>185</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-UINT-COUNTER</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_6">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>80</y>
+        <width>185</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-SEC</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_7">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>110</y>
+        <width>105</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NSEC:</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_8">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>32</y>
+        <width>105</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Timestamp:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_4">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>32</y>
+        <width>185</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>80</y>
+        <width>105</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEC:</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_9">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>140</y>
+        <width>105</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>MASTER:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_5">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>110</y>
+        <width>185</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>-5</x>
+        <y>65</y>
+        <width>321</width>
+        <height>1</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>40</y>
+      <width>337</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="caLineEdit" name="calineedit_3">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>145</y>
+       <width>200</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>97</y>
+       <width>90</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Previous:</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>145</y>
+       <width>90</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Max.:</string>
+     </property>
+    </widget>
+    <widget class="caLineEdit" name="calineedit_2">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>97</y>
+       <width>200</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-PERF_PREV_</string>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_2">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>15</y>
+       <width>340</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Time interval between pulse ID arrivals:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>90</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current:</string>
+     </property>
+    </widget>
+    <widget class="caLineEdit" name="calineedit">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>50</y>
+       <width>200</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-CURR_</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>-2</x>
+      <y>0</y>
+      <width>711</width>
+      <height>33</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Sans Serif</family>
+      <pointsize>18</pointsize>
+      <weight>75</weight>
+      <italic>false</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="statusTip">
+     <string>Operation</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>$(SYS)-$(DEVICE): Data Buffer Readout</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading</set>
+    </property>
+   </widget>
+   <zorder>calabel</zorder>
+   <zorder>carelateddisplay</zorder>
+   <zorder>groupBox_3</zorder>
+   <zorder>groupBox_4</zorder>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caRelatedDisplay</class>
+   <extends>QWidget</extends>
+   <header>caRelatedDisplay</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
