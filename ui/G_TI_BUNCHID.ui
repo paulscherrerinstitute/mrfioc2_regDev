@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>688</width>
+    <width>648</width>
     <height>226</height>
    </rect>
   </property>
@@ -17,9 +17,9 @@
    <widget class="caRelatedDisplay" name="carelateddisplay">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>2</y>
-      <width>131</width>
+      <x>470</x>
+      <y>45</y>
+      <width>171</width>
       <height>27</height>
      </rect>
     </property>
@@ -43,9 +43,9 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>40</y>
-      <width>331</width>
-      <height>181</height>
+      <y>100</y>
+      <width>291</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="title">
@@ -55,9 +55,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>5</y>
-       <width>311</width>
-       <height>171</height>
+       <y>10</y>
+       <width>271</width>
+       <height>101</height>
       </rect>
      </property>
      <property name="font">
@@ -79,22 +79,22 @@
      <widget class="caLineEdit" name="calineedit_6">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>30</y>
-        <width>185</width>
+        <x>80</x>
+        <y>33</y>
+        <width>180</width>
         <height>20</height>
        </rect>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-SEC</string>
+       <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-MASTER-TS-SEC</string>
       </property>
      </widget>
      <widget class="caLabel" name="calabel_7">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>60</y>
-        <width>105</width>
+        <x>-10</x>
+        <y>73</y>
+        <width>70</width>
         <height>20</height>
        </rect>
       </property>
@@ -102,43 +102,12 @@
        <string>NSEC:</string>
       </property>
      </widget>
-     <widget class="caLabel" name="calabel_8">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>130</y>
-        <width>105</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Timestamp:</string>
-      </property>
-     </widget>
-     <widget class="caLineEdit" name="calineedit_4">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>130</y>
-        <width>185</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-SET-TIMESTAMP</string>
-      </property>
-     </widget>
      <widget class="caLabel" name="calabel_6">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>30</y>
-        <width>105</width>
+        <y>33</y>
+        <width>70</width>
         <height>20</height>
        </rect>
       </property>
@@ -149,30 +118,14 @@
      <widget class="caLineEdit" name="calineedit_5">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>60</y>
-        <width>185</width>
+        <x>80</x>
+        <y>73</y>
+        <width>180</width>
         <height>20</height>
        </rect>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-MASTER-TS-NSEC</string>
-      </property>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="geometry">
-       <rect>
-        <x>-5</x>
-        <y>100</y>
-        <width>321</width>
-        <height>1</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string/>
-      </property>
-      <property name="flat">
-       <bool>true</bool>
+       <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-MASTER-TS-NSEC</string>
       </property>
      </widget>
     </widget>
@@ -199,7 +152,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-PERF-MAX-I</string>
      </property>
     </widget>
     <widget class="caLabel" name="calabel_5">
@@ -259,7 +212,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-PERF-I</string>
      </property>
     </widget>
     <widget class="caLineEdit" name="calineedit_2">
@@ -272,7 +225,7 @@
       </rect>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-I</string>
      </property>
     </widget>
     <widget class="caLabel" name="calabel_4">
@@ -311,7 +264,7 @@
       <string>Reset</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchIdRx-PERF-MAX-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):BunchId$(SIG)-PERF-MAX-I</string>
      </property>
      <property name="pressMessage">
       <string notr="true">0</string>
@@ -343,7 +296,7 @@
      <string notr="true"/>
     </property>
     <property name="text">
-     <string>$(SYS)-$(DEVICE): Data Buffer Readout</string>
+     <string>$(SYS)-$(DEVICE): Data Buffer Readout - $(SIG)</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading</set>
