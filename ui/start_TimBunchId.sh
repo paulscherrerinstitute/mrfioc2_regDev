@@ -2,28 +2,27 @@
 set -o errexit
 
 #Set caqtdm display path - to retrieve the stylesheet file
-export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:/sf/rf/config/qt:/sf/controls/config/qt
+export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:/sf/rf/config/qt:$CAQTDM_DISPLAY_PATH
 
 SYS=""
 DEVICE="EVR0"
-NAME="EVR0DBUF"
+NAME=$DEVICE"DBUF"
 SCREEN="G_TI_BUNCHID.ui"
-SIG="Rx"
+MODE="Rx"
 
 usage()
 {
     echo "Usage: $0 [options]"
     echo "Options:"
-    echo "    -s <system name>     (required) The system/project name"
-    echo "    -d <DEVICE name>     Timing card name (default: $DEVICE)"
-    echo "    -n <regDev name>     regDev name (default: $NAME)"
-    echo "    -m <signal mode>     For Data Buffer Transmission mode use 'Tx' (default: $SIG)"
-    echo "    -h                   This help"
+    echo "    -s <system name>     (required) System name (ie FIN)."
+    echo "    -d <DEVICE name>     Timing card name (ie EVR0) - (default: $DEVICE)."
+    echo "    -m <mode>     	   For Data Buffer Transmission mode use 'Tx' - (default: $MODE)."
+    echo "    -h                   This help."
 }
 
 s_flag=0 # reset s_flag (-s is required)
 
-while getopts ":s:d:n:m:h" o; do
+while getopts ":s:d:m:h" o; do
     case "${o}" in
         s)
             SYS=${OPTARG}
@@ -33,12 +32,8 @@ while getopts ":s:d:n:m:h" o; do
             DEVICE=${OPTARG}
             ;;
 
-        n)
-            NAME=${OPTARG}
-            ;;
-
         m)
-            SIG=${OPTARG}
+            MODE=${OPTARG}
             ;;
 
         h)
@@ -58,7 +53,7 @@ if [ $s_flag -eq 0 ]; then
     exit 1
 fi
 
-macro="SYS=$SYS,NAME=$NAME,DEVICE=$DEVICE,SIG=$SIG"
+macro="SYS=$SYS,NAME=$DEVICE"DBUF",DEVICE=$DEVICE,MODE=$MODE"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
 startDM -stylefile sfop.qss -macro "$macro" $SCREEN &
