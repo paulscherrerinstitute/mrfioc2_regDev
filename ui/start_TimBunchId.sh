@@ -2,7 +2,7 @@
 set -o errexit
 
 #Set caqtdm display path - to retrieve the stylesheet file
-export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:/sf/rf/config/qt:$CAQTDM_DISPLAY_PATH
+export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:$CAQTDM_DISPLAY_PATH
 
 SYS=""
 DEVICE="EVR0"
