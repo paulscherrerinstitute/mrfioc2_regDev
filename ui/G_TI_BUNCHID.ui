@@ -43,7 +43,7 @@
       </font>
      </property>
      <property name="title">
-      <string> Timestamp </string>
+      <string> Master Timestamp </string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -54,8 +54,8 @@
      <widget class="caLineEdit" name="calineedit_6">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>33</y>
+        <x>90</x>
+        <y>50</y>
         <width>250</width>
         <height>20</height>
        </rect>
@@ -80,8 +80,8 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>73</y>
-        <width>70</width>
+        <y>90</y>
+        <width>85</width>
         <height>20</height>
        </rect>
       </property>
@@ -93,8 +93,8 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>33</y>
-        <width>70</width>
+        <y>50</y>
+        <width>85</width>
         <height>20</height>
        </rect>
       </property>
@@ -105,8 +105,8 @@
      <widget class="caLineEdit" name="calineedit_5">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>73</y>
+        <x>90</x>
+        <y>90</y>
         <width>250</width>
         <height>20</height>
        </rect>
@@ -131,7 +131,7 @@
       <property name="geometry">
        <rect>
         <x>-10</x>
-        <y>110</y>
+        <y>180</y>
         <width>350</width>
         <height>1</height>
        </rect>
@@ -140,6 +140,44 @@
        <string/>
       </property>
       <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_8">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>127</y>
+        <width>85</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Counter:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_7">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>127</y>
+        <width>250</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-UINT-COUNTER</string>
+      </property>
+      <property name="unitsEnabled">
        <bool>true</bool>
       </property>
      </widget>
@@ -311,7 +349,7 @@
      <property name="font">
       <font>
        <family>Sans Serif</family>
-       <pointsize>14</pointsize>
+       <pointsize>12</pointsize>
        <weight>75</weight>
        <italic>false</italic>
        <bold>true</bold>
@@ -344,7 +382,7 @@
     <property name="font">
      <font>
       <family>Sans Serif</family>
-      <pointsize>21</pointsize>
+      <pointsize>13</pointsize>
       <weight>75</weight>
       <italic>false</italic>
       <bold>true</bold>
