@@ -63,24 +63,16 @@ record(longout, "$(P)TX-PULSEID-Flush_") {
   field(DTYP, "regDev")
   field(OUT, "@$(NAME):0x0")
   field(VAL, "1")
+  field(FLNK,"$(P)TX-PULSEID-jump-counter")
+}
+
+record(calc,"$(P)TX-PULSEID-jump-counter") {         
+  field(INPA,"$(P)TX-PULSEID-I")
+  field(INPB,"-1")
+  field(INPC,"$(P)TX-PULSEID-jump-counter")
+  field(CALC,"A-B#1?C+1:C;B:=A")
+  field(PRIO, "HIGH")
   field(FLNK,"$(P)TX-PULSEID-PERF-CURR_")
-}
-
-record(calcout, "$(P)TX-PULSEID_") {
-  field(CALC, "A")
-  field(INPA, "$(P)TX-PULSEID-PulseCounter")
-  field(OUT, "$(P)TX-PULSEID-I PP")
-  field(FLNK, "$(P)TX-PULSEID-jump-counter")
-}
-
-record(calcout,"$(P)TX-PULSEID-jump-counter") {         
-  field(INPA,"$(P)TX-PULSEID_")
-  field(INPB,"$(P)TX-PULSEID-jump-counter")
-  field(INPC,"$(P)TX-PULSEID-jump-counter.OVAL")
-  field(CALC,"A")
-  field(OCAL,"A-B#1?C+1:C")
-  field(OOPT,"When Non-zero")
-  field(DOPT,"Use OCAL")
 }
 
 #### measures time interval between pulse ID arraivals ###

@@ -24,14 +24,11 @@ record(ai, "$(P)RX-PULSEID-I") {
   field(FLNK, "$(P)RX-PULSEID-jump-counter")
 }
 
-record(calcout,"$(P)RX-PULSEID-jump-counter") {         
+record(calc,"$(P)RX-PULSEID-jump-counter") {         
   field(INPA,"$(P)RX-PULSEID-I")
-  field(INPB,"$(P)RX-PULSEID-jump-counter")
-  field(INPC,"$(P)RX-PULSEID-jump-counter.OVAL")
-  field(CALC,"A")
-  field(OCAL,"A-B#1?C+1:C")
-  field(OOPT,"When Non-zero")
-  field(DOPT,"Use OCAL")
+  field(INPB,"-1")
+  field(INPC,"$(P)RX-PULSEID-jump-counter")
+  field(CALC,"A-B#1?C+1:C;B:=A")
   field(PRIO, "HIGH")
   field(FLNK,"$(P)RX-PULSEID-PERF-CURR_")
 }
