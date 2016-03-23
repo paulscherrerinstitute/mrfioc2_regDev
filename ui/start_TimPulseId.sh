@@ -53,7 +53,7 @@ if [ $s_flag -eq 0 ]; then
     exit 1
 fi
 
-macro="SYS=$SYS"-DBUF",NAME=$DEVICE"DBUF",DEVICE=$DEVICE,MODE=$MODE"
+macro="P=$SYS-$DEVICE"-DBUF:",NAME=$DEVICE"DBUF",MODE=$MODE"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
 startDM -stylefile sfop.qss -macro "$macro" $SCREEN &

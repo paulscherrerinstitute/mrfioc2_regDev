@@ -70,7 +70,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-MASTER-TS-SEC</string>
+       <string notr="true">$(P)$(MODE)-PULSEID-MASTER-TS-SEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -121,7 +121,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-MASTER-TS-NSEC</string>
+       <string notr="true">$(P)$(MODE)-PULSEID-MASTER-TS-NSEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -175,7 +175,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-UINT-COUNTER</string>
+       <string notr="true">$(P)$(MODE)-PULSEID-UINT-COUNTER</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -214,7 +214,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-MAX-I</string>
+      <string notr="true">$(P)$(MODE)-PULSEID-PERF-MAX-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -286,7 +286,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-I</string>
+      <string notr="true">$(P)$(MODE)-PULSEID-PERF-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -311,7 +311,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-I</string>
+      <string notr="true">$(P)$(MODE)-PULSEID-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -363,7 +363,7 @@
  Max. Value</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-MAX-I</string>
+      <string notr="true">$(P)$(MODE)-PULSEID-PERF-MAX-I</string>
      </property>
      <property name="pressMessage">
       <string notr="true">0</string>
@@ -395,7 +395,7 @@
      <string notr="true"/>
     </property>
     <property name="text">
-     <string>$(SYS)-$(DEVICE): Data Buffer Readout - $(MODE)</string>
+     <string>$(P) Data Buffer Readout - $(MODE)</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading</set>

@@ -17,10 +17,10 @@
 # (regDev). It loads the pulseId integer into the appropriate register and then flushes
 # the buffer.
 #
-record(ao, "$(SYS)-$(DEVICE):TX-PULSEID-I") {
+record(ao, "$(P)TX-PULSEID-I") {
   field(DTYP, "regDev")
   field(OUT, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
-  field(FLNK, "$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TIMESTAMP")
+  field(FLNK, "$(P)TX-PULSEID-MASTER-TIMESTAMP")
 }
 
 # reads timestamp (of the master) 
@@ -28,55 +28,55 @@ record(ao, "$(SYS)-$(DEVICE):TX-PULSEID-I") {
 # it gives seconds past epics epoch in VAL
 # it gives nsec of epics timestamp in RVAL  
 #
-record(ai,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TIMESTAMP") {
+record(ai,"$(P)TX-PULSEID-MASTER-TIMESTAMP") {
   field(DTYP,"Soft SetTimestamp")
-  field(INP,"$(SYS)-$(DEVICE):TX-PULSEID-I")
+  field(INP,"$(P)TX-PULSEID-I")
   field(TSE,"-2")
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TS-SEC")
+  field(FLNK,"$(P)TX-PULSEID-MASTER-TS-SEC")
 }
 
-record(calcout,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TS-SEC") {
+record(calcout,"$(P)TX-PULSEID-MASTER-TS-SEC") {
   field(DTYP, "regDev")
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TIMESTAMP.VAL")    # master timestamp seconds
+  field(INPA,"$(P)TX-PULSEID-MASTER-TIMESTAMP.VAL")    # master timestamp seconds
   field(CALC,"A")
   field(OUT, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TS-NSEC")
+  field(FLNK,"$(P)TX-PULSEID-MASTER-TS-NSEC")
 }
 
-record(calcout,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TS-NSEC") {
+record(calcout,"$(P)TX-PULSEID-MASTER-TS-NSEC") {
   field(DTYP, "regDev")
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID-MASTER-TIMESTAMP.RVAL")   # master timestamp nanoseconds
+  field(INPA,"$(P)TX-PULSEID-MASTER-TIMESTAMP.RVAL")   # master timestamp nanoseconds
   field(CALC,"A")
   field(OUT, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
-  field(FLNK, "$(SYS)-$(DEVICE):TX-PULSEID-UINT-COUNTER")
+  field(FLNK, "$(P)TX-PULSEID-UINT-COUNTER")
 }
 
-record(calcout,"$(SYS)-$(DEVICE):TX-PULSEID-UINT-COUNTER") {
+record(calcout,"$(P)TX-PULSEID-UINT-COUNTER") {
   field(DTYP, "regDev")
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID-UINT-COUNTER.VAL")   # master 32-bits counter
+  field(INPA,"$(P)TX-PULSEID-UINT-COUNTER.VAL")   # master 32-bits counter
   field(CALC,"A+1")
   field(OUT, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
-  field(FLNK, "$(SYS)-$(DEVICE):TX-PULSEID-Flush_")
+  field(FLNK, "$(P)TX-PULSEID-Flush_")
 }
 
-record(longout, "$(SYS)-$(DEVICE):TX-PULSEID-Flush_") {
+record(longout, "$(P)TX-PULSEID-Flush_") {
   field(DTYP, "regDev")
   field(OUT, "@$(NAME):0x0")
   field(VAL, "1")
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-CURR_")
+  field(FLNK,"$(P)TX-PULSEID-PERF-CURR_")
 }
 
-record(calcout, "$(SYS)-$(DEVICE):TX-PULSEID_") {
+record(calcout, "$(P)TX-PULSEID_") {
   field(CALC, "A")
-  field(INPA, "$(SYS)-$(DEVICE):TX-PULSEID-PulseCounter")
-  field(OUT, "$(SYS)-$(DEVICE):TX-PULSEID-I PP")
-  field(FLNK, "$(SYS)-$(DEVICE):TX-PULSEID-jump-counter")
+  field(INPA, "$(P)TX-PULSEID-PulseCounter")
+  field(OUT, "$(P)TX-PULSEID-I PP")
+  field(FLNK, "$(P)TX-PULSEID-jump-counter")
 }
 
-record(calcout,"$(SYS)-$(DEVICE):TX-PULSEID-jump-counter") {         
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID_")
-  field(INPB,"$(SYS)-$(DEVICE):TX-PULSEID-jump-counter")
-  field(INPC,"$(SYS)-$(DEVICE):TX-PULSEID-jump-counter.OVAL")
+record(calcout,"$(P)TX-PULSEID-jump-counter") {         
+  field(INPA,"$(P)TX-PULSEID_")
+  field(INPB,"$(P)TX-PULSEID-jump-counter")
+  field(INPC,"$(P)TX-PULSEID-jump-counter.OVAL")
   field(CALC,"A")
   field(OCAL,"A-B#1?C+1:C")
   field(OOPT,"When Non-zero")
@@ -84,33 +84,33 @@ record(calcout,"$(SYS)-$(DEVICE):TX-PULSEID-jump-counter") {
 }
 
 #### measures time interval between pulse ID arraivals ###
-record(ai,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-CURR_") {
+record(ai,"$(P)TX-PULSEID-PERF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
   field(PRIO,"HIGH")
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-I")
+  field(FLNK,"$(P)TX-PULSEID-PERF-I")
 }
 
 ##Time from previous in us
-record(calc,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-I"){
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-CURR_ NPP")
-  field(INPB,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-PERF_PREV_ NPP")
+record(calc,"$(P)TX-PULSEID-PERF-I"){
+  field(INPA,"$(P)TX-PULSEID-PERF-CURR_ NPP")
+  field(INPB,"$(P)TX-PULSEID-PERF-PERF_PREV_ NPP")
   field(CALC,"(A-B)*1000")
   field(PREC,"9")
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-PERF_PREV_")
+  field(FLNK,"$(P)TX-PULSEID-PERF-PERF_PREV_")
 }
 
-record(ai, "$(SYS)-$(DEVICE):TX-PULSEID-PERF-PERF_PREV_"){
+record(ai, "$(P)TX-PULSEID-PERF-PERF_PREV_"){
   field(DESC,"Performance meas previous time")
-  field(INP, "$(SYS)-$(DEVICE):TX-PULSEID-PERF-CURR_ NPP")
+  field(INP, "$(P)TX-PULSEID-PERF-CURR_ NPP")
   field(PREC,"9" )
-  field(FLNK,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-MAX-I")
+  field(FLNK,"$(P)TX-PULSEID-PERF-MAX-I")
 }
 
 
-record(calc,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-MAX-I"){
-  field(INPA,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-I NPP")
-  field(INPB,"$(SYS)-$(DEVICE):TX-PULSEID-PERF-MAX-I NPP")
+record(calc,"$(P)TX-PULSEID-PERF-MAX-I"){
+  field(INPA,"$(P)TX-PULSEID-PERF-I NPP")
+  field(INPB,"$(P)TX-PULSEID-PERF-MAX-I NPP")
   field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
   field(PREC,"9")
   field(EGU, "ms")
