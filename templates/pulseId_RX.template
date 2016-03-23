@@ -1,0 +1,113 @@
+# Pulse ID data buffer receive
+#
+# Mandatory macros:
+#  SYS = System name (ie FIN)
+#  DEVICE = Timing card name (ie EVR0)
+#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUF)
+#  
+# Optional macros:
+#  PULSEID_OFFSET = address offset (0x10)
+#  MASTSEC_OFFSET = seconds offset (default: 0x18)
+#  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#
+# Description:
+#
+# This database receives the pulse id via databuffer, using Tom Slejko's driver
+# (regDev).
+
+record(ai, "$(SYS)-$(DEVICE):RX-PULSEID-I") {
+  field(DTYP, "regDev")
+  field(INP, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
+  field(SCAN, "I/O Intr")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(SYS)-$(DEVICE):RX-PULSEID-jump-counter")
+}
+
+record(calcout,"$(SYS)-$(DEVICE):RX-PULSEID-jump-counter") {         
+  field(INPA,"$(SYS)-$(DEVICE):RX-PULSEID-I")
+  field(INPB,"$(SYS)-$(DEVICE):RX-PULSEID-jump-counter")
+  field(INPC,"$(SYS)-$(DEVICE):RX-PULSEID-jump-counter.OVAL")
+  field(CALC,"A")
+  field(OCAL,"A-B#1?C+1:C")
+  field(OOPT,"When Non-zero")
+  field(DOPT,"Use OCAL")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-CURR_")
+}
+
+record(longin,"$(SYS)-$(DEVICE):RX-PULSEID-MASTER-TS-SEC") {
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
+  field(FLNK, "$(SYS)-$(DEVICE):RX-PULSEID-MASTER-TS-NSEC")
+  field(PRIO, "HIGH")
+}
+
+record(longin,"$(SYS)-$(DEVICE):RX-PULSEID-MASTER-TS-NSEC") {
+  field(DTYP, "regDev")
+  field(INP, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(SYS)-$(DEVICE):RX-PULSEID-SET-TIMESTAMP")
+}
+
+record(longin,"$(SYS)-$(DEVICE):RX-PULSEID-UINT-COUNTER") {
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
+  field(PRIO, "HIGH")
+}
+
+# reads timestamp from the master SEC and NSEC
+# and set the timestamp of this record
+# Everey record that wants timestamp of the master sets its TSEL field
+# to point to TIME fiel of this record
+# VAL and OVAL give also sec and nsec of the master in double  
+#
+record(calcout,"$(SYS)-$(DEVICE):RX-PULSEID-SET-TIMESTAMP") {
+  field(INPA,"$(SYS)-$(DEVICE):RX-PULSEID-MASTER-TS-SEC")
+  field(INPB,"$(SYS)-$(DEVICE):RX-PULSEID-MASTER-TS-NSEC")
+  field(TSE,"-2")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(SYS)-$(DEVICE):RX-PULSEID-DUMMY-FROM-TSEL")
+}
+
+record(calcout,"$(SYS)-$(DEVICE):RX-PULSEID-DUMMY-FROM-TSEL") {
+  field(INPA,"$(SYS)-$(DEVICE):RX-PULSEID-DUMMY-FROM-TSEL")
+  field(CALC,"A+1")
+  field(TSEL,"$(SYS)-$(DEVICE):RX-PULSEID-SET-TIMESTAMP.TIME")
+  field(PRIO, "HIGH")
+}
+
+#### measures time interval between pulse ID arraivals ###
+record(ai,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-CURR_") {
+  field(DTYP,"Soft Timestamp")
+  field(PREC,"9")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-I")
+}
+
+##Time from previous in us
+record(calc,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-I"){
+  field(INPA,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-CURR_ NPP")
+  field(INPB,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-PERF_PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-PERF_PREV_")
+}
+
+record(ai, "$(SYS)-$(DEVICE):RX-PULSEID-PERF-PERF_PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(SYS)-$(DEVICE):RX-PULSEID-PERF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-MAX-I")
+}
+
+
+record(calc,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-MAX-I"){
+  field(INPA,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-I NPP")
+  field(INPB,"$(SYS)-$(DEVICE):RX-PULSEID-PERF-MAX-I NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
+  field(PREC,"9")
+  field(EGU, "ms")
+}

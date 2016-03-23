@@ -70,7 +70,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-MASTER-TS-SEC</string>
+       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-MASTER-TS-SEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -121,7 +121,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-MASTER-TS-NSEC</string>
+       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-MASTER-TS-NSEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -175,7 +175,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-UINT-COUNTER</string>
+       <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-UINT-COUNTER</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -214,7 +214,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-PERF-MAX-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-MAX-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -244,7 +244,7 @@
      </property>
      <property name="font">
       <font>
-       <pointsize>12</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="text">
@@ -286,7 +286,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-PERF-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -311,7 +311,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -328,13 +328,13 @@
      </property>
      <property name="font">
       <font>
-       <pointsize>12</pointsize>
+       <pointsize>11</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>Bunch ID:</string>
+      <string>Pulse ID:</string>
      </property>
     </widget>
     <widget class="caMessageButton" name="camessagebutton">
@@ -349,7 +349,7 @@
      <property name="font">
       <font>
        <family>Sans Serif</family>
-       <pointsize>12</pointsize>
+       <pointsize>13</pointsize>
        <weight>75</weight>
        <italic>false</italic>
        <bold>true</bold>
@@ -363,7 +363,7 @@
  Max. Value</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(SYS)-$(DEVICE):BunchId$(MODE)-PERF-MAX-I</string>
+      <string notr="true">$(SYS)-$(DEVICE):$(MODE)-PULSEID-PERF-MAX-I</string>
      </property>
      <property name="pressMessage">
       <string notr="true">0</string>
@@ -382,7 +382,7 @@
     <property name="font">
      <font>
       <family>Sans Serif</family>
-      <pointsize>13</pointsize>
+      <pointsize>19</pointsize>
       <weight>75</weight>
       <italic>false</italic>
       <bold>true</bold>
