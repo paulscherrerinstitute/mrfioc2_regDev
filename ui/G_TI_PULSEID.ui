@@ -210,6 +210,9 @@
        <pointsize>12</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>max(abs(current-10))</string>
+     </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
@@ -230,7 +233,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Max.:</string>
+      <string>Max. Jitter:</string>
      </property>
     </widget>
     <widget class="caLabel" name="calabel_2">
