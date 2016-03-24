@@ -1,8 +1,7 @@
 # Pulse ID data buffer transmission
 #
 # Mandatory macros:
-#  SYS = System name (ie FIN)
-#  DEVICE = Timing card name (ie EVG0)
+#  P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:)
 #  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVG0DBUF)
 #  
 # Optional macros:
