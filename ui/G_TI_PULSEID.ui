@@ -70,7 +70,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(P)$(MODE)-PULSEID-MASTER-TS-SEC</string>
+       <string notr="true">$(P)$(MODE)-MTS-SEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -121,7 +121,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(P)$(MODE)-PULSEID-MASTER-TS-NSEC</string>
+       <string notr="true">$(P)$(MODE)-MTS-NSEC</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -175,7 +175,7 @@
        <set>Qt::AlignCenter</set>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(P)$(MODE)-PULSEID-UINT-COUNTER</string>
+       <string notr="true">$(P)$(MODE)-UINT-CNT</string>
       </property>
       <property name="unitsEnabled">
        <bool>true</bool>
@@ -217,7 +217,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(P)$(MODE)-PULSEID-PERF-MAX-I</string>
+      <string notr="true">$(P)$(MODE)-PERF-MAX-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -289,7 +289,7 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(P)$(MODE)-PULSEID-PERF-I</string>
+      <string notr="true">$(P)$(MODE)-PERF-I</string>
      </property>
      <property name="unitsEnabled">
       <bool>true</bool>
@@ -366,7 +366,7 @@
  Max. Value</string>
      </property>
      <property name="channel" stdset="0">
-      <string notr="true">$(P)$(MODE)-PULSEID-PERF-MAX-I</string>
+      <string notr="true">$(P)$(MODE)-PERF-MAX-I</string>
      </property>
      <property name="pressMessage">
       <string notr="true">0</string>

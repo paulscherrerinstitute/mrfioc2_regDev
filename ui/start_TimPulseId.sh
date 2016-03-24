@@ -6,7 +6,7 @@ export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:$CAQTDM_DISPLAY_PATH
 
 SYS=""
 DEVICE="EVR0"
-NAME=$DEVICE"DBUF"
+DBUF="DBUF"
 SCREEN="G_TI_PULSEID.ui"
 MODE="RX"
 
@@ -17,6 +17,7 @@ usage()
     echo "    -s <system name>     (required) System name (ie FIN)."
     echo "    -d <DEVICE name>     Timing card name (ie EVR0) - (default: $DEVICE)."
     echo "    -m <mode>     	   For Data Buffer Transmission mode use 'Tx' - (default: $MODE)."
+    echo "    -b <DBUF name>     Unique DBUF identifier (eg. DBUF) - (default: $DBUF)."
     echo "    -h                   This help."
 }
 
@@ -34,6 +35,10 @@ while getopts ":s:d:m:h" o; do
 
         m)
             MODE=${OPTARG}
+            ;;
+            
+       	b)
+            DBUF=${OPTARG}
             ;;
 
         h)
@@ -53,7 +58,7 @@ if [ $s_flag -eq 0 ]; then
     exit 1
 fi
 
-macro="P=$SYS-$DEVICE"-DBUF:",NAME=$DEVICE"DBUF",MODE=$MODE"
+macro="P=$SYS-$DEVICE-$DBUF:,MODE=$MODE"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
 startDM -stylefile sfop.qss -macro "$macro" $SCREEN &
