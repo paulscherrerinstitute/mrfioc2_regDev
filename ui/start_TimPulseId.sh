@@ -6,7 +6,6 @@ export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:$CAQTDM_DISPLAY_PATH
 
 SYS=""
 DEVICE="EVR0"
-DBUF="DBUF"
 SCREEN="G_TI_PULSEID.ui"
 MODE="RX"
 
@@ -58,7 +57,7 @@ if [ $s_flag -eq 0 ]; then
     exit 1
 fi
 
-macro="P=$SYS-$DEVICE-$DBUF:,MODE=$MODE"
+macro="P=$SYS-$DEVICE:,MODE=$MODE"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
 startDM -stylefile sfop.qss -macro "$macro" $SCREEN &
