@@ -16,7 +16,6 @@ usage()
     echo "    -s <system name>     (required) System name (ie FIN)."
     echo "    -d <DEVICE name>     Timing card name (ie EVR0) - (default: $DEVICE)."
     echo "    -m <mode>     	   For Data Buffer Transmission mode use 'Tx' - (default: $MODE)."
-    echo "    -b <DBUF name>     Unique DBUF identifier (eg. DBUF) - (default: $DBUF)."
     echo "    -h                   This help."
 }
 

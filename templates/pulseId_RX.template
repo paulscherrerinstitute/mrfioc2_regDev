@@ -9,6 +9,7 @@
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
 #  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#  MTS_FLNK = FLNK to be processed after Master Timestamp has been read
 #
 # Description:
 #
@@ -19,7 +20,8 @@
 #  $(P)RX-PULSEID  - Received Pulse ID
 #  $(P)RX-MTS-SEC  - Received master timestamp seconds
 #  $(P)RX-MTS-NSEC - Received master timestamp nanoseconds
-#  $(P)RX-MTS      - Holds master timestamp in TIME field
+#  $(P)RX-MTS      - Holds master timestamp in TIME field. 
+#					 To use it use TSEL field n your record. See below.
 #  $(P)RX-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
 #  $(P)RX-PERF     - Time between current and previous arrival
 #  $(P)RX-PERF-MAX - Max jitter - difference between succesive arrivals minus 10 ms
@@ -78,7 +80,7 @@ record(longin,"$(P)RX-UINT-CNT") {
 #  field(DESC,"Use timestamp from TSEL and display it as string")
 #  field(DTYP,"Soft Timestamp")
 #  field(INP, "@%b %d, %Y %H:%M:%S.%09f")
-#  field(TSEL,"$(P)RX-GET-MTS.TIME")
+#  field(TSEL,"$(P)RX-MTS.TIME")
 #  field(PRIO, "HIGH")
 #}
 
@@ -89,7 +91,7 @@ record(calcout,"$(P)RX-MTS") {
   field(INPB,"$(P)RX-MTS-NSEC")
   field(TSE,"-2")
   field(PRIO, "HIGH")
-#  field(FLNK,"$(P)RX-DUMMY-FROM-TSEL")
+  field(FLNK,"$(MTS_FLNK=)")
 }
 
 #### measures time interval between pulse ID arraivals ###
