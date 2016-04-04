@@ -57,7 +57,7 @@ record(longin,"$(P)RX-MTS-NSEC") {
   field(DTYP, "regDev")
   field(INP, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(P)RX-GET-MTS")
+  field(FLNK, "$(P)RX-MTS")
 }
 
 record(longin,"$(P)RX-UINT-CNT") {
@@ -75,14 +75,16 @@ record(longin,"$(P)RX-UINT-CNT") {
 #
 # Example: Stamp client record with master timestamp 
 #record(stringin,"$(P)RX-DUMMY-FROM-TSEL") {
+#  field(DESC,"Use timestamp from TSEL and display it as string")
 #  field(DTYP,"Soft Timestamp")
 #  field(INP, "@%b %d, %Y %H:%M:%S.%09f")
 #  field(TSEL,"$(P)RX-GET-MTS.TIME")
 #  field(PRIO, "HIGH")
 #}
 
-record(calcout,"$(P)RX-GET-MTS") {
+record(calcout,"$(P)RX-MTS") {
   field(DESC,"Holds master timestamp in TIME field")
+  field(DTYP, "Soft SetTimestamp")
   field(INPA,"$(P)RX-MTS-SEC")
   field(INPB,"$(P)RX-MTS-NSEC")
   field(TSE,"-2")
