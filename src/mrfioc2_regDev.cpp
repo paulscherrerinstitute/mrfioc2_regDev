@@ -111,6 +111,15 @@ epicsExportAddress(int, mrfioc2_regDevDebug);
 #define _unused(x)
 #endif
 
+// printf formatting for size_t differs on windows
+#ifdef _WIN32
+    #define FORMAT_SIZET_U "Iu"
+    #define FORMAT_SIZET_X "Ix"
+#else
+    #define FORMAT_SIZET_U "zu"
+    #define FORMAT_SIZET_X "zx"
+#endif
+
 #define dataBuffer_userOffset 16
 
 /*
@@ -158,7 +167,7 @@ static void mrfioc2_regDev_flush(regDevice* device)
 void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
     regDevice* device = (regDevice *)pvt;
 
-    dbgPrintf(2,"Received new DATA at %d+%d\n", updated_offset, length);
+    dbgPrintf(2,"Received new DATA at %"FORMAT_SIZET_U"+%"FORMAT_SIZET_U"\n", updated_offset, length);
 
     scanIoRequest(device->ioscanpvt);
 }
@@ -170,7 +179,7 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
 
 void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
     printf("mrfioc2 regDev: %s\n\t" \
-           "Max length: %zu\n\t" \
+           "Max length: %"FORMAT_SIZET_U"\n\t" \
            "protocol: %u\n\t" \
            "Supports transmission: %s\n\t" \
            "Supports reception: %s\n\t",
@@ -178,7 +187,7 @@ void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
            device->dataBufferUser->supportsTx() ? "yes":"no", device->dataBufferUser->supportsRx() ? "yes":"no");
 
     if(device->invalidOffset > 0) {
-        printf("Invalid offsets: [1, %zu]\n", device->invalidOffset);
+        printf("Invalid offsets: [1, %"FORMAT_SIZET_U"]\n", device->invalidOffset);
     }else {
         printf("Invalid offsets: none\n");
     }
@@ -204,7 +213,7 @@ int mrfioc2_regDev_read(
         regDevTransferComplete _unused(callback),
         char* user)
 {
-    dbgPrintf(3,"%s: from %s:0x%x len: 0x%x\n",  user, device->name, (int)offset, (int)(datalength*nelem));
+    dbgPrintf(3,"%s: from %s:0x%"FORMAT_SIZET_X" len: 0x%"FORMAT_SIZET_X"\n",  user, device->name, offset, (datalength*nelem));
 
     epicsUInt32 receivedProtocol = 0;
 
@@ -220,7 +229,7 @@ int mrfioc2_regDev_read(
     regDevCopy(datalength, nelem, &device->rxBuffer[offset], pdata, NULL, REGDEV_LE_SWAP);  // Copy received data to the record
     device->dataBufferUser->releaseRxBuffer();
 
-    if (device->protocol != 0) dbgPrintf(3,"%s: protocol = %d\n", device->name, receivedProtocol);
+    if (device->protocol != 0) dbgPrintf(3,"%s: protocol = %u\n", device->name, receivedProtocol);
 
     return 0;
 }
@@ -247,7 +256,7 @@ int mrfioc2_regDev_write(
     }
 
     if (offset <= device->invalidOffset || offset + datalength > device->maxLength) { // out of bounds check
-        errlogPrintf("Offset %zu not in [%zu, %zu]\n", offset, device->invalidOffset+1, device->maxLength - datalength);
+        errlogPrintf("Offset %"FORMAT_SIZET_U" not in [%"FORMAT_SIZET_U", %"FORMAT_SIZET_U"]\n", offset, device->invalidOffset+1, device->maxLength - datalength);
         return 1;
     }
 
@@ -256,7 +265,7 @@ int mrfioc2_regDev_write(
     regDevCopy(datalength, nelem, pdata, &device->txBuffer[offset], pmask, REGDEV_LE_SWAP);
     device->dataBufferUser->releaseTxBuffer(offset, datalength);
 
-    dbgPrintf(2,"Written new DATA at %d+%d\n", offset, datalength);
+    dbgPrintf(2,"Written new DATA at %"FORMAT_SIZET_U"+%u\n", offset, datalength);
     return 0;
 }
 
@@ -329,7 +338,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     }
     if (device->protocol != 0) {
         device->invalidOffset = sizeof(device->protocol) -1;
-        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %d.\n\tInvalid write offsets: [1, %zu]\n", regDevName, device->protocol, device->invalidOffset);
+        dbgPrintf(1,"mrfioc2_regDevConfigure %s: Registering to protocol %u.\n\tInvalid write offsets: [1, %"FORMAT_SIZET_U"]\n", regDevName, device->protocol, device->invalidOffset);
     } else {
         dbgPrintf(1,"mrfioc2_regDevConfigure %s: Not using protocol number (set to 0)\n", regDevName);
         device->invalidOffset = 0;
@@ -340,12 +349,12 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     if (argc > 2) {
         userOffset = strtoimax(argv[2], NULL, 10);
         if (userOffset < 0 || userOffset >= device->dataBufferUser->getMaxLength()) {
-            errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [0, %zu]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
+            errlogPrintf("mrfioc2_regDevConfigure %s: User offset must be in the following range: [0, %"FORMAT_SIZET_U"]\n", regDevName, device->dataBufferUser->getMaxLength()-1);
             delete device->dataBufferUser;
             return;
         }
     }
-    dbgPrintf(1,"%s: User offset set to %d\n", regDevName, userOffset);
+    dbgPrintf(1,"%s: User offset set to %"FORMAT_SIZET_U"\n", regDevName, userOffset);
 
     // Initialize the data buffer
     if (!device->dataBufferUser->init(mrfName, userOffset, true, epicsThreadPriorityHigh)) {
@@ -359,13 +368,13 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     if (argc > 3) {
         maxLength = strtoimax(argv[3], NULL, 10);
         if (maxLength <= 0 || maxLength > device->maxLength) {
-            errlogPrintf("mrfioc2_regDevConfigure %s: Maximum data length not a number or out of range: [1, %zu]\n", regDevName, device->maxLength);
+            errlogPrintf("mrfioc2_regDevConfigure %s: Maximum data length not a number or out of range: [1, %"FORMAT_SIZET_U"]\n", regDevName, device->maxLength);
             delete device->dataBufferUser;
             return;
         }
         else device->maxLength = maxLength;
     }
-    dbgPrintf(1,"%s: Maximum data length set to %zu.\n", regDevName, device->maxLength);
+    dbgPrintf(1,"%s: Maximum data length set to %"FORMAT_SIZET_U".\n", regDevName, device->maxLength);
 
 
     if (device->dataBufferUser->supportsTx())
