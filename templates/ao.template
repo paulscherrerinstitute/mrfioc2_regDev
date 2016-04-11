@@ -1,4 +1,4 @@
-record(ao, "$(SYS)-$(DEVICE):$(ID)-TX") {
+record(ao, "$(P)$(ID)-TX") {
   field(DTYP, "regDev")
   field(OUT, "@$(NAME):$(OFFSET) $(PARAMS)")
 }

@@ -12,8 +12,8 @@
 ## Quick start (PSI)
 Access [mrfioc2_regDev](https://github.psi.ch/projects/COS/repos/mrfioc2_regdev/browse) and inspect example startup scripts:
 
-* `example/startup_bunchId_Rx.script` is an example startup script for use with bunch ID reception. 
-* `example/startup_bunchId_Tx.script` is an example startup script for use with bunch ID transmission.
+* `example/startup_pulseId_RX.script` is an example startup script for use with pulse ID reception. 
+* `example/startup_pulseId_TX.script` is an example startup script for use with pulse ID transmission.
 * `example/startup_Rx.script` is an example startup script for use with custom records.
 
 ## Register the driver

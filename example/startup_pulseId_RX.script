@@ -1,6 +1,6 @@
 ## In this example we are using reception function on the event receiver
 
-epicsEnvSet SYS "FTEST-VME-BUNCHRXTST"
+epicsEnvSet SYS "FTEST-VME-PULSERXTST"
 
 
 ##########################
@@ -24,7 +24,7 @@ require mrfioc2
 runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "DEVICE=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
 
 ########################################
-#------! Bunch ID receive setup ------!#
+#------! PULSE ID receive setup ------!#
 ########################################
 require mrfioc2_regDev
 
@@ -36,4 +36,4 @@ require mrfioc2_regDev
 # USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
 # MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_bunchID_Rx.cmd, "DEVICE=EVR0"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "DEVICE=EVR0"

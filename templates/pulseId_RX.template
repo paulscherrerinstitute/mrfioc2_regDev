@@ -1,0 +1,129 @@
+# Pulse ID data buffer receive
+#
+# Mandatory macros:
+#  P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:)
+#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUF)
+#  
+# Optional macros:
+#  PULSEID_OFFSET = address offset (0x10)
+#  MASTSEC_OFFSET = seconds offset (default: 0x18)
+#  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#  MTS_FLNK = FLNK to be processed after Master Timestamp has been read
+#
+# Description:
+#
+# This database receives the pulse id via databuffer, using Tom Slejko's driver
+# (regDev).
+#
+# Important Records:
+#  $(P)RX-PULSEID  - Received Pulse ID
+#  $(P)RX-MTS-SEC  - Received master timestamp seconds
+#  $(P)RX-MTS-NSEC - Received master timestamp nanoseconds
+#  $(P)RX-MTS      - Holds master timestamp in TIME field. 
+#					 To use it use TSEL field n your record. See below.
+#  $(P)RX-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
+#  $(P)RX-PERF     - Time between current and previous arrival
+#  $(P)RX-PERF-MAX - Max jitter - difference between succesive arrivals minus 10 ms
+
+record(ai, "$(P)RX-PULSEID") {
+  field(DESC,"Received pulse ID")
+  field(DTYP, "regDev")
+  field(INP, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
+  field(SCAN, "I/O Intr")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(P)RX-JMP-CNT")
+}
+
+record(calc,"$(P)RX-JMP-CNT") {
+  field(DESC,"Jump counter")         
+  field(INPA,"$(P)RX-PULSEID")
+  field(INPB,"-1")
+  field(INPC,"$(P)RX-JMP-CNT")
+  field(CALC,"A-B#1?C+1:C;B:=A")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(P)RX-PERF-CURR_")
+}
+
+record(longin,"$(P)RX-MTS-SEC") {
+  field(DESC,"Master timestamp - seconds") 
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
+  field(FLNK, "$(P)RX-MTS-NSEC")
+  field(PRIO, "HIGH")
+}
+
+record(longin,"$(P)RX-MTS-NSEC") {
+  field(DESC,"Master timestamp - nanoseconds") 
+  field(DTYP, "regDev")
+  field(INP, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(P)RX-MTS")
+}
+
+record(longin,"$(P)RX-UINT-CNT") {
+  field(DESC,"UINT counter")
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
+  field(PRIO, "HIGH")
+}
+
+# reads timestamp from the master SEC and NSEC
+# and set the timestamp of this record
+# Everey record that wants timestamp of the master sets its TSEL field
+# to point to TIME field of this record. See example.
+#
+# Example: Stamp client record with master timestamp 
+#record(stringin,"$(P)RX-DUMMY-FROM-TSEL") {
+#  field(DESC,"Use timestamp from TSEL and display it as string")
+#  field(DTYP,"Soft Timestamp")
+#  field(INP, "@%b %d, %Y %H:%M:%S.%09f")
+#  field(TSEL,"$(P)RX-MTS.TIME")
+#  field(PRIO, "HIGH")
+#}
+
+record(calcout,"$(P)RX-MTS") {
+  field(DESC,"Holds master timestamp in TIME field")
+  field(DTYP, "Soft SetTimestamp")
+  field(INPA,"$(P)RX-MTS-SEC")
+  field(INPB,"$(P)RX-MTS-NSEC")
+  field(TSE,"-2")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(MTS_FLNK=)")
+}
+
+#### measures time interval between pulse ID arraivals ###
+record(ai,"$(P)RX-PERF-CURR_") {
+  field(DTYP,"Soft Timestamp")
+  field(PREC,"9")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(P)RX-PERF")
+}
+
+##Time from previous in us
+record(calc,"$(P)RX-PERF"){
+  field(DESC,"Time from previous arraival in us")
+  field(INPA,"$(P)RX-PERF-CURR_ NPP")
+  field(INPB,"$(P)RX-PERF-PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(P)RX-PERF-PREV_")
+}
+
+record(ai, "$(P)RX-PERF-PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(P)RX-PERF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(P)RX-PERF-MAX")
+}
+
+record(calc,"$(P)RX-PERF-MAX"){
+  field(DESC,"Performance meas max jitter")
+  field(INPA,"$(P)RX-PERF NPP")
+  field(INPB,"$(P)RX-PERF-MAX NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
+  field(PREC,"9")
+  field(EGU, "ms")
+}

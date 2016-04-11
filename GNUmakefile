@@ -13,8 +13,8 @@ SOURCES += src/mrfioc2_regDev.cpp
 
 DBDS += src/mrfioc2_regDev.dbd
 
-TEMPLATES += templates/bunchId_Rx.template
-TEMPLATES += templates/bunchId_Tx.template
+TEMPLATES += templates/pulseId_RX.template
+TEMPLATES += templates/pulseId_TX.template
 TEMPLATES += template/ai.template
 TEMPLATES += template/ao.template
 

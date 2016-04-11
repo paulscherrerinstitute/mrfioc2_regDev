@@ -1,0 +1,123 @@
+# Pulse ID data buffer transmission
+#
+# Mandatory macros:
+#  P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:)
+#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVG0DBUF)
+#  
+# Optional macros:
+#  PULSEID_OFFSET = address offset (0x10)
+#  MASTSEC_OFFSET = seconds offset (default: 0x18)
+#  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#
+# Description:
+#
+# This database transmits the pulse id via databuffer, using Tom Slejko's driver
+# (regDev). It loads the pulseId integer into the appropriate register and then flushes
+# the buffer.
+#
+# Important Records:
+#  $(P)TX-PULSEID  - Transmitted Pulse ID
+#  $(P)TX-MTS-SEC  - Transmitted master timestamp seconds
+#  $(P)TX-MTS-NSEC - Transmitted master timestamp nanoseconds
+#  $(P)TX-MTS      - Timestamp of this record will be taken to transmit
+#  $(P)TX-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
+#  $(P)TX-PERF     - Time between current and previous processing
+#  $(P)TX-PERF-MAX - Max jitter - difference between two transmisions minus 10 ms
+
+record(ao, "$(P)TX-PULSEID") {
+  field(DESC,"Pulse ID to transmit")
+  field(DTYP, "regDev")
+  field(OUT, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
+  field(FLNK, "$(P)TX-SET-MTS")
+}
+
+# reads timestamp (of the master) 
+# and overwrites the 16 LSB of 32-bits nsec with 16 LSB of pulse ID
+# it gives seconds past epics epoch in VAL
+# it gives nsec of epics timestamp in RVAL  
+#
+record(ai,"$(P)TX-SET-MTS") {
+  field(DTYP,"Soft SetTimestamp")
+  field(INP,"$(P)TX-PULSEID")
+  field(TSE,"-2")
+  field(FLNK,"$(P)TX-MTS-SEC")
+}
+
+record(calcout,"$(P)TX-MTS-SEC") {
+  field(DESC,"Transmit MTS seconds")
+  field(DTYP, "regDev")
+  field(INPA,"$(P)TX-SET-MTS.VAL")    # master timestamp seconds
+  field(CALC,"A")
+  field(OUT, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
+  field(FLNK,"$(P)TX-MTS-NSEC")
+}
+
+record(calcout,"$(P)TX-MTS-NSEC") {
+  field(DESC,"Transmit MTS nanoseconds")
+  field(DTYP, "regDev")
+  field(INPA,"$(P)TX-SET-MTS.RVAL")   # master timestamp nanoseconds
+  field(CALC,"A")
+  field(OUT, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
+  field(FLNK, "$(P)TX-UINT-CNT")
+}
+
+record(calcout,"$(P)TX-UINT-CNT") {
+  field(DESC,"Transmit UINT count")
+  field(DTYP, "regDev")
+  field(INPA,"$(P)TX-UINT-CNT.VAL")   # master 32-bits counter
+  field(CALC,"A+1")
+  field(OUT, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
+  field(FLNK, "$(P)TX-Flush_")
+}
+
+record(longout, "$(P)TX-Flush_") {
+  field(DTYP, "regDev")
+  field(OUT, "@$(NAME):0x0")
+  field(VAL, "1")
+  field(FLNK,"$(P)TX-JMP-CNT")
+}
+
+record(calc,"$(P)TX-JMP-CNT") { 
+  field(DESC,"Jump counter")        
+  field(INPA,"$(P)TX-PULSEID")
+  field(INPB,"-1")
+  field(INPC,"$(P)TX-JMP-CNT")
+  field(CALC,"A-B#1?C+1:C;B:=A")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(P)TX-PERF-CURR_")
+}
+
+#### measures time interval between pulse ID arraivals ###
+record(ai,"$(P)TX-PERF-CURR_") {
+  field(DTYP,"Soft Timestamp")
+  field(PREC,"9")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(P)TX-PERF")
+}
+
+##Time from previous in us
+record(calc,"$(P)TX-PERF"){
+  field(DESC,"Time from previous proceccing in us")
+  field(INPA,"$(P)TX-PERF-CURR_ NPP")
+  field(INPB,"$(P)TX-PERF-PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(P)TX-PERF-PREV_")
+}
+
+record(ai, "$(P)TX-PERF-PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(P)TX-PERF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(P)TX-PERF-MAX")
+}
+
+record(calc,"$(P)TX-PERF-MAX"){
+  field(DESC,"Performance meas max jitter")
+  field(INPA,"$(P)TX-PERF NPP")
+  field(INPB,"$(P)TX-PERF-MAX NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
+  field(PREC,"9")
+  field(EGU, "ms")
+}
