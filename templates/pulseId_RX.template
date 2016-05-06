@@ -13,8 +13,7 @@
 #
 # Description:
 #
-# This database receives the pulse id via databuffer, using Tom Slejko's driver
-# (regDev).
+# This database receives the pulse id via databuffer
 #
 # Important Records:
 #  $(P)RX-PULSEID  - Received Pulse ID

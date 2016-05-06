@@ -79,3 +79,11 @@ Building the driver on the PSI infrastructure is a bit different, since it lever
 * to install the driver run `make install` in the `mrfioc2_regdev` folder on the build server.
 
 The driver builds as a single library, which can be loaded using `require` to your IOC. Installation process also copies all the necessary support files (eg. templates) to the appropriate module folder. For more options inspect driver.makefile and require documentation available at the PSI wiki.
+
+
+
+# Authors 
+
+- Tom Slejko (tom.slejko@cosylab.com)
+- Babak Kalantari (babak.kalantari@psi.ch)
+- Saso Skube (saso.skube@cosylab.com)

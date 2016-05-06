@@ -12,8 +12,7 @@
 #
 # Description:
 #
-# This database transmits the pulse id via databuffer, using Tom Slejko's driver
-# (regDev). It loads the pulseId integer into the appropriate register and then flushes
+# This database transmits the pulse id via databuffer. It loads the pulseId integer into the appropriate register and then flushes
 # the buffer.
 #
 # Important Records:
