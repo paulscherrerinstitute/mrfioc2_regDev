@@ -89,7 +89,7 @@ record(calc,"$(P)TX-JMP-CNT") {
   field(FLNK,"$(P)TX-PERF-CURR_")
 }
 
-#### measures time interval between pulse ID arraivals ###
+#### measures time interval between pulse ID arrivals ###
 record(ai,"$(P)TX-PERF-CURR_") {
   field(DTYP,"Soft Timestamp")
   field(PREC,"9")
@@ -99,7 +99,7 @@ record(ai,"$(P)TX-PERF-CURR_") {
 
 ##Time from previous in us
 record(calc,"$(P)TX-PERF"){
-  field(DESC,"Time from previous proceccing in us")
+  field(DESC,"Time from previous processing in us")
   field(INPA,"$(P)TX-PERF-CURR_ NPP")
   field(INPB,"$(P)TX-PERF-PREV_ NPP")
   field(CALC,"(A-B)*1000")

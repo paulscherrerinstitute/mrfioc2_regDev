@@ -80,6 +80,9 @@ Building the driver on the PSI infrastructure is a bit different, since it lever
 
 The driver builds as a single library, which can be loaded using `require` to your IOC. Installation process also copies all the necessary support files (eg. templates) to the appropriate module folder. For more options inspect driver.makefile and require documentation available at the PSI wiki.
 
+## TODO
+
+- add templates to EPICS build system
 
 
 # Authors 

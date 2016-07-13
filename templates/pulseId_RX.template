@@ -103,7 +103,7 @@ record(ai,"$(P)RX-PERF-CURR_") {
 
 ##Time from previous in us
 record(calc,"$(P)RX-PERF"){
-  field(DESC,"Time from previous arraival in us")
+  field(DESC,"Time from previous arrival in us")
   field(INPA,"$(P)RX-PERF-CURR_ NPP")
   field(INPB,"$(P)RX-PERF-PREV_ NPP")
   field(CALC,"(A-B)*1000")
