@@ -1,16 +1,16 @@
 # mrfioc2_regDev
-[mrfioc2_regDev](https://github.psi.ch/projects/COS/repos/mrfioc2_regdev/browse) enables the user to easily access (read or write) the data buffer that is exposed in the [mrfioc2](https://github.psi.ch/projects/ED/repos/mrfioc2/browse) EPICS device support for the Micro Research Finland ([MRF](http://www.mrf.fi/)) timing system (in short mrfioc2 driver).
+[mrfioc2_regDev](..) enables the user to easily access (read or write) the data buffer that is exposed in the [mrfioc2](https://github.psi.ch/epics_driver_modules/mrfioc2) EPICS device support for the Micro Research Finland ([MRF](http://www.mrf.fi/)) timing system (in short mrfioc2 driver).
 
 
 
 ## Prerequisites
 
-- [mrfioc2](https://github.psi.ch/projects/ED/repos/mrfioc2/browse)
-- [regDev](https://github.psi.ch/projects/ED/repos/regdev/browse). Documentation is [here](https://controls.web.psi.ch/cgi-bin/twiki/view/Main/RegDev).
+- [mrfioc2](https://github.psi.ch/epics_driver_modules/mrfioc2)
+- [regDev](https://git.psi.ch/epics_driver_modules/regDev). Documentation is [here](https://controls.web.psi.ch/cgi-bin/twiki/view/Main/RegDev).
 
 
 ## Quick start (PSI)
-Access [mrfioc2_regDev](https://github.psi.ch/projects/COS/repos/mrfioc2_regdev/browse) and inspect example startup scripts:
+Access [mrfioc2_regDev](..) and inspect example startup scripts:
 
 * `example/startup_pulseId_RX.script` is an example startup script for use with pulse ID reception. 
 * `example/startup_pulseId_TX.script` is an example startup script for use with pulse ID transmission.
@@ -67,14 +67,14 @@ In this example:
 
 The mrfioc2_regDev is structured as an ordinary EPICS application. In order to build it from source:
 
-* clone the sources from git repository by running command `git clone https://github.psi.ch/scm/cos/mrfioc2_regdev.git`, which creates a top folder called `mrfioc2_regdev`.
+* clone the sources from git repository by running command `git clone https://git.psi.ch/cosylab/mrfioc2_regdev.git`, which creates a top folder called `mrfioc2_regdev`.
 * update files in `mrfioc2_regdev/configure` folder to match your system (eg. set paths in `configure/RELEASE`).
 * run `make -f Makefile` in the `mrfioc2_regdev` folder.
 
 ### PSI
 Building the driver on the PSI infrastructure is a bit different, since it leverages the driver.makefile. In order to build it:
 
-* clone the sources from git repository by running command `git clone https://github.psi.ch/scm/cos/mrfioc2_regdev.git`, which creates a top folder called `mrfioc2_regdev`.
+* clone the sources from git repository by running command `git clone https://git.psi.ch/cosylab/mrfioc2_regdev.git`, which creates a top folder called `mrfioc2_regdev`.
 * run `make` in the `mrfioc2_regdev` folder on the build server.
 * to install the driver run `make install` in the `mrfioc2_regdev` folder on the build server.
 
