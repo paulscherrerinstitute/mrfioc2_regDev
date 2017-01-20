@@ -16,6 +16,24 @@ Access [mrfioc2_regDev](..) and inspect example startup scripts:
 * `example/startup_pulseId_TX.script` is an example startup script for use with pulse ID transmission.
 * `example/startup_Rx.script` is an example startup script for use with custom records.
 
+Here is an example of mrfioc2_regDev startup script snippet used for event receiver named `EVR0`:
+    
+    ########################################
+    #------! PULSE ID receive setup ------!#
+    ########################################
+    require mrfioc2_regDev
+
+    # The following macros are available to set up the mrfioc2 regDev:
+    # SYS 			is used as a prefix for all records. It is recommended to be the same as the EVR/EVG prefix.
+    # DEVICE 		is the event receiver or event generator / timing card name. (default: EVR0)
+    # NAME 			is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUF == EVR0DBUF
+    # PROTOCOL 		Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols. (default: 0)
+    # USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
+    # MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
+
+    runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0"
+
+
 ## Register the driver
 
 mrfioc2_regDev is registered via iocsh command:

@@ -1,8 +1,5 @@
 ## In this example we are using reception function on the event receiver
 
-epicsEnvSet SYS "FTEST-VME-PULSERXTST"
-
-
 ##########################
 #-----! EVR Setup ------!#
 ##########################
@@ -19,9 +16,9 @@ require mrfioc2
 #epicsEnvSet  EVR_MEMOFFSET	0x3000000	## is the base A24 address (default: 0x3000000)
 #epicsEnvSet  EVR_IRQLINE 	0x5			## is the interrupt level. (default: 0x5)
 #epicsEnvSet  EVR_IRQVECT	0x26		## is the interrupt vector (default: 0x26)
-#epicsEnvSet EVR_SUBS is the path to the substitution file that should be loaded. (default: cfg/$(DEVICE).subs=cfg/EVR0.subs)
+#epicsEnvSet  EVR_SUBS is the path to the substitution file that should be loaded. (default: cfg/$(DEVICE).subs=cfg/EVR0.subs)
 
-runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "DEVICE=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
+runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
 
 ########################################
 #------! PULSE ID receive setup ------!#
@@ -29,11 +26,11 @@ runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "DEVICE=EVR0, EVR_SLOT=4, EVR_MEMO
 require mrfioc2_regDev
 
 # The following macros are available to set up the mrfioc2 regDev:
-# SYS 			is used as a prefix for all records. In this example it is set at the beginning using 'epicsEnvSet'
+# SYS 			is used as a prefix for all records. It is recommended to be the same as the EVR/EVG prefix.
 # DEVICE 		is the event receiver or event generator / timing card name. (default: EVR0)
 # NAME 			is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUF == EVR0DBUF
 # PROTOCOL 		Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols. (default: 0)
 # USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
 # MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "DEVICE=EVR0"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0"
