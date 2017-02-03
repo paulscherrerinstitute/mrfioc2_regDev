@@ -87,6 +87,7 @@
  */
 
 #include <mrmDataBufferUser.h>
+#include <mrmDataBufferType.h>
 
 /*
  *  EPICS headers
@@ -211,7 +212,7 @@ int mrfioc2_regDev_read(
         void* pdata,
         int _unused(priority),
         regDevTransferComplete _unused(callback),
-        char* user)
+        const char* user)
 {
     dbgPrintf(3,"%s: from %s:0x%"FORMAT_SIZET_X" len: 0x%"FORMAT_SIZET_X"\n",  user, device->name, offset, (datalength*nelem));
 
@@ -247,7 +248,7 @@ int mrfioc2_regDev_write(
         void* pmask,
         int _unused(priority),
         regDevTransferComplete _unused(callback),
-        char* user)
+        const char* user)
 {
     // Offset 0 is always used to send-out the data buffer (flush it)
     if (offset <= 0) {
@@ -270,8 +271,21 @@ int mrfioc2_regDev_write(
 }
 
 
-IOSCANPVT mrfioc2_regDev_getInIoscan(regDevice* device, size_t _unused(offset))
+IOSCANPVT mrfioc2_regDev_getInIoscan(
+        regDevice *device,
+        size_t offset,
+        unsigned int dlen,
+        size_t nelem,
+        int intvec,
+        const char* user)
 {
+//    printf("Registering ioscan:\n" \
+//           "\toffset: 0x%x\n" \
+//           "\tdlen: 0x%x\n" \
+//           "\tnelem: %zu\n" \
+//           "\tintvec: 0x%x\n" \
+//           "\tuser: %s\n" \
+//           "\n", offset, dlen, nelem, intvec, user);
     return device->ioscanpvt;
 }
 
@@ -295,12 +309,13 @@ static const regDevSupport mrfioc2_regDevSupport = {
  * Args:Can not find mrf device: %s
  *         name - desired name of the regDev device
  *         device - name of mrfioc2 device - timing card (evg, evr, ...)
+ *         type - data buffer type: 0 = 230 series, 1 = 300 series
  *         protocol - protocol to use, or 0 to disable it. When not provided defaults to 0.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
  *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  */
 
-void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int argc, char** argv)
+void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int type, int argc, char** argv)
 {
     if (!regDevName || !mrfName) {
         errlogPrintf("usage: mrfioc2_regDevConfigure \"name\", \"device\", [protocol] [userOffset] [maxLength]\n");
@@ -357,7 +372,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
     dbgPrintf(1,"%s: User offset set to %"FORMAT_SIZET_U"\n", regDevName, userOffset);
 
     // Initialize the data buffer
-    if (!device->dataBufferUser->init(mrfName, userOffset, true, epicsThreadPriorityHigh)) {
+    if (!device->dataBufferUser->init(mrfName, (mrmDataBufferType::type_t)type, userOffset, true, epicsThreadPriorityHigh)) {
         delete device->dataBufferUser;
         return;
     }
@@ -405,13 +420,14 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ar
 /*         mrfioc2_regDevConfigure           */
 static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "name", iocshArgString};
 static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "device", iocshArgString};
-static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "protocol userOffset maxLength", iocshArgArgv}; // protocol, user offset, max interested length
-static const iocshArg *const mrfioc2_regDevConfigureDefArgs[3] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2};
+static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "type", iocshArgInt};
+static const iocshArg mrfioc2_regDevConfigureDefArg3 = { "protocol userOffset maxLength", iocshArgArgv}; // protocol, user offset, max interested length
+static const iocshArg *const mrfioc2_regDevConfigureDefArgs[4] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2, &mrfioc2_regDevConfigureDefArg3};
 
-static const iocshFuncDef mrfioc2_regDevConfigureDef = {"mrfioc2_regDevConfigure", 3, mrfioc2_regDevConfigureDefArgs};
+static const iocshFuncDef mrfioc2_regDevConfigureDef = {"mrfioc2_regDevConfigure", 4, mrfioc2_regDevConfigureDefArgs};
 
 static void mrfioc2_regDevConfigureFunc(const iocshArgBuf* args) {
-    mrfioc2_regDevConfigure(args[0].sval, args[1].sval, args[2].aval.ac, args[2].aval.av);
+    mrfioc2_regDevConfigure(args[0].sval, args[1].sval, args[2].ival, args[3].aval.ac, args[3].aval.av);
 }
 
 
