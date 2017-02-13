@@ -20,7 +20,7 @@
 #  $(P)RX-MTS-SEC  - Received master timestamp seconds
 #  $(P)RX-MTS-NSEC - Received master timestamp nanoseconds
 #  $(P)RX-MTS      - Holds master timestamp in TIME field. 
-#					 To use it use TSEL field n your record. See below.
+#					           To use it use TSEL field in your record. See below.
 #  $(P)RX-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
 #  $(P)RX-PERF     - Time between current and previous arrival
 #  $(P)RX-PERF-MAX - Max jitter - difference between succesive arrivals minus 10 ms

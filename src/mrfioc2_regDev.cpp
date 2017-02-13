@@ -133,8 +133,8 @@ struct regDevice{
     epicsUInt8*             rxBuffer;       // pointer to rx buffer
     epicsUInt8*             txBuffer;       // pointer to tx buffer
     epicsUInt32             protocol;       // protocol ID
-    size_t                  maxLength;      // underlying data buffer capacity
     size_t                  invalidOffset;  // writing to [0, invalidOffset] fails. The offset is dependant on protocol (its size, and if it is used or not)
+    size_t                  interestID;     // ID used to update registered interest on the data buffer
 };
 
 
@@ -180,11 +180,10 @@ void mrmEvrDataRxCB(size_t updated_offset, size_t length, void* pvt) {
 
 void mrfioc2_regDev_report(regDevice* device, int _unused(level)) {
     printf("mrfioc2 regDev: %s\n\t" \
-           "Max length: %"FORMAT_SIZET_U"\n\t" \
            "protocol: %u\n\t" \
            "Supports transmission: %s\n\t" \
            "Supports reception: %s\n\t",
-           device->name, device->maxLength, device->protocol,
+           device->name, device->protocol,
            device->dataBufferUser->supportsTx() ? "yes":"no", device->dataBufferUser->supportsRx() ? "yes":"no");
 
     if(device->invalidOffset > 0) {
@@ -256,8 +255,8 @@ int mrfioc2_regDev_write(
         return 0;
     }
 
-    if (offset <= device->invalidOffset || offset + datalength > device->maxLength) { // out of bounds check
-        errlogPrintf("Offset %"FORMAT_SIZET_U" not in [%"FORMAT_SIZET_U", %"FORMAT_SIZET_U"]\n", offset, device->invalidOffset+1, device->maxLength - datalength);
+    if (offset <= device->invalidOffset) { // out of bounds check (max is already checked by regDev)
+        errlogPrintf("Invalid offset: [0, %"FORMAT_SIZET_U"]\n", device->invalidOffset);
         return 1;
     }
 
@@ -276,16 +275,15 @@ IOSCANPVT mrfioc2_regDev_getInIoscan(
         size_t offset,
         unsigned int dlen,
         size_t nelem,
-        int intvec,
-        const char* user)
+        int _unused(intvec),
+        const char* _unused(user))
 {
-//    printf("Registering ioscan:\n" \
-//           "\toffset: 0x%x\n" \
-//           "\tdlen: 0x%x\n" \
-//           "\tnelem: %zu\n" \
-//           "\tintvec: 0x%x\n" \
-//           "\tuser: %s\n" \
-//           "\n", offset, dlen, nelem, intvec, user);
+    device->interestID = device->dataBufferUser->registerInterest(offset, dlen*nelem, mrmEvrDataRxCB, device, device->interestID);
+    dbgPrintf(2,"Registering interest id %"FORMAT_SIZET_U" on offset %"FORMAT_SIZET_U" with length %"FORMAT_SIZET_U"\n", device->interestID, offset, dlen*nelem);
+    if (device->interestID == 0) {
+        errlogPrintf("mrfioc2_regDevConfigure %s: ERROR! Could not register for data buffer reception on offset 0x%"FORMAT_SIZET_X" with length %"FORMAT_SIZET_U"\n", regDevName, offset, nelem*dlen);
+    }
+
     return device->ioscanpvt;
 }
 
@@ -312,13 +310,12 @@ static const regDevSupport mrfioc2_regDevSupport = {
  *         type - data buffer type: 0 = 230 series, 1 = 300 series
  *         protocol - protocol to use, or 0 to disable it. When not provided defaults to 0.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
- *         maxLength - maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  */
 
 void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int type, int argc, char** argv)
 {
     if (!regDevName || !mrfName) {
-        errlogPrintf("usage: mrfioc2_regDevConfigure \"name\", \"device\", [protocol] [userOffset] [maxLength]\n");
+        errlogPrintf("usage: mrfioc2_regDevConfigure \"name\", \"device\", [protocol] [userOffset]\n");
         return;
     }
 
@@ -339,6 +336,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
     }
     device->name = (char*)(device + 1);
     strcpy(device->name, regDevName);
+    device->interestID = 0;
 
 
     /*
@@ -377,21 +375,6 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
         return;
     }
 
-    // Set max length we are interested in
-    device->maxLength = device->dataBufferUser->getMaxLength();
-    size_t maxLength;
-    if (argc > 3) {
-        maxLength = strtoimax(argv[3], NULL, 10);
-        if (maxLength <= 0 || maxLength > device->maxLength) {
-            errlogPrintf("mrfioc2_regDevConfigure %s: Maximum data length not a number or out of range: [1, %"FORMAT_SIZET_U"]\n", regDevName, device->maxLength);
-            delete device->dataBufferUser;
-            return;
-        }
-        else device->maxLength = maxLength;
-    }
-    dbgPrintf(1,"%s: Maximum data length set to %"FORMAT_SIZET_U".\n", regDevName, device->maxLength);
-
-
     if (device->dataBufferUser->supportsTx())
     {
         dbgPrintf(1,"%s: %s supports TX buffer.\n", regDevName, mrfName);
@@ -400,17 +383,10 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
     if (device->dataBufferUser->supportsRx())
     {
         dbgPrintf(1,"%s: %s supports RX buffer. Registering interest and installing callbacks\n", regDevName, mrfName);
-
-        if (!device->dataBufferUser->registerInterest(0, device->maxLength, mrmEvrDataRxCB, device)) {
-            errlogPrintf("mrfioc2_regDevConfigure %s: FATAL ERROR! Could not register for data buffer reception!", regDevName);
-            delete device->dataBufferUser;
-            return;
-        }
-
         scanIoInit(&device->ioscanpvt);
     }
 
-    regDevRegisterDevice(regDevName, &mrfioc2_regDevSupport, device, device->maxLength);
+    regDevRegisterDevice(regDevName, &mrfioc2_regDevSupport, device, device->dataBufferUser->getMaxLength());
 }
 
 /****************************************/
@@ -420,8 +396,8 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
 /*         mrfioc2_regDevConfigure           */
 static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "name", iocshArgString};
 static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "device", iocshArgString};
-static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "type", iocshArgInt};
-static const iocshArg mrfioc2_regDevConfigureDefArg3 = { "protocol userOffset maxLength", iocshArgArgv}; // protocol, user offset, max interested length
+static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "type", iocshArgInt};  // which data buffer type? is it 230 series, 300 series?
+static const iocshArg mrfioc2_regDevConfigureDefArg3 = { "protocol userOffset", iocshArgArgv}; // protocol, user offset
 static const iocshArg *const mrfioc2_regDevConfigureDefArgs[4] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2, &mrfioc2_regDevConfigureDefArg3};
 
 static const iocshFuncDef mrfioc2_regDevConfigureDef = {"mrfioc2_regDevConfigure", 4, mrfioc2_regDevConfigureDefArgs};
