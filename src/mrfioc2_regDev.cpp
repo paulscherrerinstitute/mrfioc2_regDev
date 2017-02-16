@@ -307,12 +307,12 @@ static const regDevSupport mrfioc2_regDevSupport = {
  * Args:Can not find mrf device: %s
  *         name - desired name of the regDev device
  *         device - name of mrfioc2 device - timing card (evg, evr, ...)
- *         type - data buffer type: 0 = 230 series, 1 = 300 series
+ *         type - data buffer type: 230 or 300
  *         protocol - protocol to use, or 0 to disable it. When not provided defaults to 0.
  *         userOffset- offset from the start of the data buffer that we are using. When not provided defaults to dataBuffer_userOffset.
  */
 
-void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int type, int argc, char** argv)
+void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, const char* type, int argc, char** argv)
 {
     if (!regDevName || !mrfName) {
         errlogPrintf("usage: mrfioc2_regDevConfigure \"name\", \"device\", [protocol] [userOffset]\n");
@@ -322,6 +322,20 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
     //Check if device already exists:
     if (regDevFind(regDevName)) {
         errlogPrintf("mrfioc2_regDevConfigure: FATAL ERROR! device %s already exists!\n", regDevName);
+        return;
+    }
+
+    mrmDataBufferType::type_t dataBufferType;
+    bool typeFound = false;
+    for(size_t t = mrmDataBufferType::type_first; t <= mrmDataBufferType::type_last; t++) {
+        if(strcmp(type, mrmDataBufferType::type_string[t]) == 0) {
+            dataBufferType = (mrmDataBufferType::type_t)t;
+            typeFound = true;
+            break;
+        }
+    }
+    if(!typeFound) {
+        fprintf(stderr, "Wrong data buffer type selected: %s\n", type);
         return;
     }
 
@@ -370,7 +384,7 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
     dbgPrintf(1,"%s: User offset set to %"FORMAT_SIZET_U"\n", regDevName, userOffset);
 
     // Initialize the data buffer
-    if (!device->dataBufferUser->init(mrfName, (mrmDataBufferType::type_t)type, userOffset, true, epicsThreadPriorityHigh)) {
+    if (!device->dataBufferUser->init(mrfName, dataBufferType, userOffset, true, epicsThreadPriorityHigh)) {
         delete device->dataBufferUser;
         return;
     }
@@ -396,14 +410,14 @@ void mrfioc2_regDevConfigure(const char* regDevName, const char* mrfName, int ty
 /*         mrfioc2_regDevConfigure           */
 static const iocshArg mrfioc2_regDevConfigureDefArg0 = { "name", iocshArgString};
 static const iocshArg mrfioc2_regDevConfigureDefArg1 = { "device", iocshArgString};
-static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "type", iocshArgInt};  // which data buffer type? is it 230 series, 300 series?
+static const iocshArg mrfioc2_regDevConfigureDefArg2 = { "type [230, 300]", iocshArgString};  // which data buffer type? is it 230 series, 300 series?
 static const iocshArg mrfioc2_regDevConfigureDefArg3 = { "protocol userOffset", iocshArgArgv}; // protocol, user offset
 static const iocshArg *const mrfioc2_regDevConfigureDefArgs[4] = {&mrfioc2_regDevConfigureDefArg0, &mrfioc2_regDevConfigureDefArg1, &mrfioc2_regDevConfigureDefArg2, &mrfioc2_regDevConfigureDefArg3};
 
 static const iocshFuncDef mrfioc2_regDevConfigureDef = {"mrfioc2_regDevConfigure", 4, mrfioc2_regDevConfigureDefArgs};
 
 static void mrfioc2_regDevConfigureFunc(const iocshArgBuf* args) {
-    mrfioc2_regDevConfigure(args[0].sval, args[1].sval, args[2].ival, args[3].aval.ac, args[3].aval.av);
+    mrfioc2_regDevConfigure(args[0].sval, args[1].sval, args[2].sval, args[3].aval.ac, args[3].aval.av);
 }
 
 

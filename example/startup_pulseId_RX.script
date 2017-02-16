@@ -3,22 +3,25 @@
 ##########################
 #-----! EVR Setup ------!#
 ##########################
+require tosca
 require mrfioc2
-
-###########################
-#-----! EVR Setup ------!#
-##########################
 ## The following parameters are available to set up the device. They can either be set as an epics environmental variable, or passed as a macro to the 'runScript' command:
 
-# Command 'runScript' also accepts the SYS macro, which is used as a prefix for all records.
-#epicsEnvSet  DEVICE		"EVR0"		## is the event receiver / timing card name. (default: EVR0)
-#epicsEnvSet  EVR_SLOT		3			## is the VME crate slot where EVR is inserted. (default: 3)
-#epicsEnvSet  EVR_MEMOFFSET	0x3000000	## is the base A24 address (default: 0x3000000)
-#epicsEnvSet  EVR_IRQLINE 	0x5			## is the interrupt level. (default: 0x5)
-#epicsEnvSet  EVR_IRQVECT	0x26		## is the interrupt vector (default: 0x26)
-#epicsEnvSet  EVR_SUBS is the path to the substitution file that should be loaded. (default: cfg/$(DEVICE).subs=cfg/EVR0.subs)
+# The following macros are available to set up the mrfioc2:
+# SYS 			 is used as a prefix for all records.
+# DEVICE		 is the event receiver / timing card name. (default: EVR0)
+# EVR_SLOT		 is the VME crate slot where EVR is inserted. (default: 3)
+# EVR_MEMOFFSET	 is the base A32 address (default: 0x3000000)
+# EVR_IRQLINE 	 is the interrupt level. (default: 0x5)
+# EVR_IRQVECT	 is the interrupt vector (default: 0x26)
+# EVR_SUBS       is the path to the substitution file that should be loaded. (default: cfg/$(DEVICE).subs=cfg/EVR0.subs)
+#                The following macros can be used to load example substitution files already available in the mrfioc2 module:
+#                EVR_SUBS=$(mrfioc2_DB)/evr_VME-300.subs      for EVR-VME-300 device series
+#                EVR_SUBS=$(mrfioc2_DB)/evr_VME-230.subs      for EVR-VME-230 device series
 
-runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
+runScript $(mrfioc2_DIR)/mrfioc2_evr-VME.cmd, "SYS=STEST-VME-PULSERXTST, DEVICE=EVR0, EVR_SLOT=4, EVR_MEMOFFSET=0x3000000, EVR_IRQLINE=0x5, EVR_SUBS=$(mrfioc2_TEMPLATES)/evr_VME-300.subs"
+
+
 
 ########################################
 #------! PULSE ID receive setup ------!#
@@ -29,9 +32,10 @@ require mrfioc2_regDev
 # SYS 			is used as a prefix for all records. It is recommended to be the same as the EVR/EVG prefix.
 # DEVICE 		is the event receiver or event generator / timing card name. (default: EVR0)
 # NAME 			is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUF == EVR0DBUF
-# TYPE			is the data buffer type to search for. Values: 0 = 230 series type (variable length data buffer), 1 = 300 series type (segmented data buffer). Default: 300 series type
+# TYPE			is the data buffer type to search for. Values: 230 = 230 series type (variable length data buffer), 300 = 300 series type (segmented data buffer). Default: 300
+# ID            is used when multiple instances of the template are loaded. The ID is used in record names. Defaults to empty string. For example, when using 230 and 300 series data buffer at the same time
 # PROTOCOL 		Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols. (default: 0)
 # USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
 # MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
 
-runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0, TYPE=1"
+runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=STEST-VME-PULSERXTST, DEVICE=EVR0, TYPE=300"
