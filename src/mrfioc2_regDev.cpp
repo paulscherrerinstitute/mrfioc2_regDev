@@ -10,12 +10,14 @@
 **
 ** -- DOCS ----------------------------------------------------------------
 ** Driver is registered via iocsh command:
-**         mrfioc2_regDevConfigure <name> <device> <protocol> <userOffset> <maxLength>
+**         mrfioc2_regDevConfigure <name> <device> <protocol> <userOffset>
 **
 **             -name: name of device as seen from regDev. E.g. this
 **                         name must be the same as parameter 1 in record OUT/IN
 **
 **             -device: name of timing card (EVG0, EVR0, EVR1, ...)
+**
+**             -type: data buffer type. 230 or 300
 **
 **             -protocol: protocol (32 bit int). Useful when using 230 series
 **                         hardware. 300 series uses segmented data buffer, which
@@ -28,11 +30,10 @@
 **                         of regDev using the same mrfName but different regDevNames and
 **                         protocols.
 **
-**             -userOffset: offset from the start of the data buffer that we are using. When not provided defaults to 16.
-**             -maxLength: maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
+**             -userOffset: offset from the start of the data buffer that we are using. When not provided defaults to 0.
 **
 **
-**         example:    mrfioc2_regDevConfigure EVG0DBUF EVG0 0 16 32
+**         example:    mrfioc2_regDevConfigure EVG0DBUF EVG0 300 0 16
 **
 **
 ** EPICS use:
@@ -121,7 +122,7 @@ epicsExportAddress(int, mrfioc2_regDevDebug);
     #define FORMAT_SIZET_X "zx"
 #endif
 
-#define dataBuffer_userOffset 16
+#define dataBuffer_userOffset 0
 
 /*
  * mrfDev reg driver private
@@ -281,7 +282,7 @@ IOSCANPVT mrfioc2_regDev_getInIoscan(
     device->interestID = device->dataBufferUser->registerInterest(offset, dlen*nelem, mrmEvrDataRxCB, device, device->interestID);
     dbgPrintf(2,"Registering interest id %"FORMAT_SIZET_U" on offset %"FORMAT_SIZET_U" with length %"FORMAT_SIZET_U"\n", device->interestID, offset, dlen*nelem);
     if (device->interestID == 0) {
-        errlogPrintf("mrfioc2_regDevConfigure %s: ERROR! Could not register for data buffer reception on offset 0x%"FORMAT_SIZET_X" with length %"FORMAT_SIZET_U"\n", regDevName, offset, nelem*dlen);
+        errlogPrintf("mrfioc2_regDevConfigure %s: ERROR! Could not register for data buffer reception on offset 0x%"FORMAT_SIZET_X" with length %"FORMAT_SIZET_U"\n", device->name, offset, nelem*dlen);
     }
 
     return device->ioscanpvt;

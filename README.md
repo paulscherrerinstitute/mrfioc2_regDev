@@ -5,52 +5,52 @@
 
 ## Prerequisites
 
-- [mrfioc2](https://github.psi.ch/epics_driver_modules/mrfioc2)
-- [regDev](https://git.psi.ch/epics_driver_modules/regDev). Documentation is [here](https://controls.web.psi.ch/cgi-bin/twiki/view/Main/RegDev).
+- [mrfioc2](https://git.psi.ch/epics_driver_modules/mrfioc2)
+- [regDev](https://git.psi.ch/epics_driver_modules/regDev). Documentation is [here](https://intranet.psi.ch/Controls/RegDev).
 
 
 ## Quick start (PSI)
-Access [mrfioc2_regDev](..) and inspect example startup scripts:
+Access mrfioc2_regDev files and inspect example startup scripts:
 
 * `example/startup_pulseId_RX.script` is an example startup script for use with pulse ID reception. 
 * `example/startup_pulseId_TX.script` is an example startup script for use with pulse ID transmission.
-* `example/startup_Rx.script` is an example startup script for use with custom records.
 
-Here is an example of mrfioc2_regDev startup script snippet used for event receiver named `EVR0`:
+Here is an example of mrfioc2_regDev startup script snippet used for event receiver named `EVR0` with data buffer type 300:
     
     ########################################
     #------! PULSE ID receive setup ------!#
     ########################################
     require mrfioc2_regDev
-
+    
     # The following macros are available to set up the mrfioc2 regDev:
-    # SYS 			is used as a prefix for all records. It is recommended to be the same as the EVR/EVG prefix.
-    # DEVICE 		is the event receiver or event generator / timing card name. (default: EVR0)
-    # NAME 			is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUF == EVR0DBUF
-    # PROTOCOL 		Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols. (default: 0)
-    # USER_OFFSET 	offset from the start of the data buffer that we are using. (default: 16)
-    # MAX_LENGTH 	maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length (based on data buffer maximum length and user offset)
-
-    runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=FTEST-VME-PULSERXTST, DEVICE=EVR0"
+    # SYS       is used as a prefix for all records. It is recommended to be the same as the EVR/EVG prefix.
+    # DEVICE    is the event receiver or event generator / timing card name. (default: EVR0)
+    # NAME      is the regDev name that will be configured for this device. Defaults to $(DEVICE=EVR0)DBUF == EVR0DBUF
+    # TYPE      is the data buffer type to search for. Values: 230 = 230 series type (variable length data buffer), 300 = 300 series type (segmented data buffer). Default: 300
+    # ID        is used when multiple instances of the template are loaded. The ID is used in record names. Defaults to empty string. For example, when using 230 and 300 series data buffer at the same time
+    # PROTOCOL    Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol id are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same DEVICE but different NAME and PROTOCOL. (default: 0)
+    # USER_OFFSET   offset from the start of the data buffer that we are using. (default: 16)
+    
+    runScript $(mrfioc2_regDev_DIR)/mrfioc2_regDev_pulseID_RX.cmd, "SYS=STEST-VME-PULSERXTST, DEVICE=EVR0, TYPE=300"
 
 
 ## Register the driver
 
 mrfioc2_regDev is registered via iocsh command:
 
-    mrfioc2_regDevConfigure name device protocol userOffset maxLength
+    mrfioc2_regDevConfigure name device type protocol userOffset
 where:
 
 * `name` is the name of device as seen from regDev. E.g. this name must be the same as parameter 1 in record OUT/IN links.
 * `device` is the name of timing card (EVG0, EVR0, EVR1, ...)
-* `protocol` is the protocol ID (32 bit int). Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol ID are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same mrfName but different regDevNames and protocols.
+* `type` is the data buffer type. 230 or 300
+* `protocol` is the protocol ID (32 bit int). Useful when using 230 series hardware. 300 series uses segmented data buffer, which makes the protocol ID redundant. If protocol ID is set to 0, than receiver will accept all buffers. This is useful for debugging. If protocol != 0 then only received buffers with same protocol ID are accepted. If you need to work with multiple protocols you can register multiple instances of regDev using the same `device` but different `name` and protocols.
 * `userOffset` is the offset from the start of the data buffer that we are using. When not provided defaults to 16.
-* `maxLength` is the  maximum data buffer length we are interested in. Must be max(offset+length) of all records. When not provided it defaults to maximum available length.
  
 __Example:__
 
-    mrfioc2_regDevConfigure EVR0DBUF EVR0 0 16 32
-registers timing card `EVR0` with regDev name `EVR0DBUF`. No protocol is used. We are only interested in data buffer from offset 16 to 48, since `maxLength` is set to 32 and user offset is set to 16 bytes. When reading and writing from offset 0, data buffer will in fact be accessed on offset 16 (because of user offset set to 16).
+    mrfioc2_regDevConfigure EVG0DBUF EVG0 300 0 16
+registers timing card `EVR0` with regDev name `EVR0DBUF` for data buffer type 300. No protocol is used. When records are reading and writing from offset 1, data buffer will in fact be accessed on offset 17 (because of user offset set to 16). When writing to offset 0, current data in the data buffer will be sent. Depending on addresses which records use, appropriate data buffer segments will be monitored for new data. 
 
 
 ## Set up the EPICS records
@@ -97,10 +97,6 @@ Building the driver on the PSI infrastructure is a bit different, since it lever
 * to install the driver run `make install` in the `mrfioc2_regdev` folder on the build server.
 
 The driver builds as a single library, which can be loaded using `require` to your IOC. Installation process also copies all the necessary support files (eg. templates) to the appropriate module folder. For more options inspect driver.makefile and require documentation available at the PSI wiki.
-
-## TODO
-
-- add templates to EPICS build system
 
 
 # Authors 

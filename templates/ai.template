@@ -1,5 +1,0 @@
-record(ai, "$(P)$(ID)-RX") {
-  field(DTYP, "regDev")
-  field(INP, "@$(NAME):$(OFFSET) $(PARAMS)")
-  field(SCAN, "I/O Intr")
-}
