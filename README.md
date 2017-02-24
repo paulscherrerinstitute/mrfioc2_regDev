@@ -81,6 +81,10 @@ In this example:
 * additional parameter of the INP / OUT fields tells the regDev driver that the record will read / write values with the type of unsigned 32-bit integer (`T=UINT32`)
 * SCAN field of the `ai` record is set to `I/O Intr`, which means that it will be automatically processed when data arrives at this offset.
 
+## Version compatibility
+mrfioc2_regDev versions 1.0.0 and up are compatible with mrfioc2 version 2.8.0 and above and regDev version 3.4.7 (possibly newer version as well)
+mrfioc2_regDev version 0.1.0 is compatible with mrfioc2 versions 2.7.4 and above. 
+
 ## Building from scratch
 
 The mrfioc2_regDev is structured as an ordinary EPICS application. In order to build it from source:
