@@ -8,20 +8,22 @@ SYS=""
 DEVICE="EVR0"
 SCREEN="G_TI_PULSEID.ui"
 MODE="RX"
+ID=""
 
 usage()
 {
     echo "Usage: $0 [options]"
     echo "Options:"
-    echo "    -s <system name>     (required) System name (ie FIN)."
+    echo "    -s <system name>     (required) System name (ie STEST-VME-123)."
     echo "    -d <DEVICE name>     Timing card name (ie EVR0) - (default: $DEVICE)."
-    echo "    -m <mode>     	   For Data Buffer Transmission mode use 'Tx' - (default: $MODE)."
+    echo "    -m <mode>     	   For Data Buffer Transmission mode use 'TX' - (default: $MODE)."
+    echo "    -i <ID>              ID used in startup script when instantionating records - (default: empty)."
     echo "    -h                   This help."
 }
 
 s_flag=0 # reset s_flag (-s is required)
 
-while getopts ":s:d:m:h" o; do
+while getopts ":s:d:m:i:h" o; do
     case "${o}" in
         s)
             SYS=${OPTARG}
@@ -35,8 +37,8 @@ while getopts ":s:d:m:h" o; do
             MODE=${OPTARG}
             ;;
             
-       	b)
-            DBUF=${OPTARG}
+        i)
+            ID=${OPTARG}
             ;;
 
         h)
@@ -56,7 +58,7 @@ if [ $s_flag -eq 0 ]; then
     exit 1
 fi
 
-macro="P=$SYS-$DEVICE:,MODE=$MODE"
+macro="P=$SYS-$DEVICE:,MODE=$MODE$ID"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
 startDM -stylefile sfop.qss -macro "$macro" $SCREEN &

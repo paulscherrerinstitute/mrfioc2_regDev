@@ -13,10 +13,9 @@ SOURCES += src/mrfioc2_regDev.cpp
 
 DBDS += src/mrfioc2_regDev.dbd
 
-TEMPLATES += templates/pulseId_RX.template
-TEMPLATES += templates/pulseId_TX.template
-TEMPLATES += template/ai.template
-TEMPLATES += template/ao.template
+TEMPLATES += template/pulseId_RX.template
+TEMPLATES += template/pulseId_TX.template
+
 
 # If there is no numbered version of the mrfioc2 driver available
 # you can specify which version to build agains here:
