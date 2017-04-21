@@ -1,3 +1,7 @@
+ifeq ($(wildcard /ioc/tools/driver.makefile),)
+$(warning It seems you do not have the PSI build environment. Remove GNUmakefile.)
+include Makefile
+else
 include /ioc/tools/driver.makefile
 
 MODULE=mrfioc2_regDev
@@ -20,3 +24,4 @@ TEMPLATES += template/pulseId_TX.template
 # If there is no numbered version of the mrfioc2 driver available
 # you can specify which version to build agains here:
 #mrfioc2_VERSION=skube_s
+endif
