@@ -87,8 +87,8 @@
  * mrfIoc2 headers
  */
 
-#include <mrmDataBufferUser.h>
-#include <mrmDataBufferType.h>
+#include <dataBuffer/mrmDataBufferUser.h>
+#include <dataBuffer/mrmDataBufferType.h>
 
 /*
  *  EPICS headers
