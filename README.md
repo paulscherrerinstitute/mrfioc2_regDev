@@ -82,8 +82,8 @@ In this example:
 * SCAN field of the `ai` record is set to `I/O Intr`, which means that it will be automatically processed when data arrives at this offset.
 
 ## Version compatibility
-mrfioc2_regDev versions 1.0.0 and up are compatible with mrfioc2 version 2.8.0 and above and regDev version 3.4.7 (possibly newer version as well)
-mrfioc2_regDev version 0.1.0 is compatible with mrfioc2 versions 2.7.4 and above. 
+* mrfioc2_regDev versions 1.0.0 and up are compatible with mrfioc2 version 2.8.0 and above and regDev version 3.4.7 (possibly newer version as well)
+* mrfioc2_regDev version 0.1.0 is compatible with mrfioc2 versions 2.7.4 and above. 
 
 ## Building from scratch
 
@@ -102,9 +102,23 @@ Building the driver on the PSI infrastructure is a bit different, since it lever
 
 The driver builds as a single library, which can be loaded using `require` to your IOC. Installation process also copies all the necessary support files (eg. templates) to the appropriate module folder. For more options inspect driver.makefile and require documentation available at the PSI wiki.
 
+## Development workflow
+
+We follow the workflow as described in [gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows#gitflow-workflow).
+In a nutshell this means:
+* The `master` branch stores the official release history.
+* The `develop` branch serves as an integration branch for new features.
+* New features are implemented in a feature branch which should branch off the `develop` branch. The contributing developers should push their local feature branch to the server and issue a merge request.
+* New releases are prepared in a dedicated `release-*` branch.
+
 
 # Authors 
 
+- Roger Biffiger (roger.biffiger@psi.ch)
 - Tom Slejko (tom.slejko@cosylab.com)
 - Babak Kalantari (babak.kalantari@psi.ch)
+- Helge Brands (helge.brands@psi.ch)
 - Saso Skube (saso.skube@cosylab.com)
+
+Please send an e-mail to roger.biffiger@psi.ch if anyone is missing!
+
