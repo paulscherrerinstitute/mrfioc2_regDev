@@ -87,8 +87,13 @@
  * mrfIoc2 headers
  */
 
+#ifdef _WIN32
 #include <dataBuffer/mrmDataBufferUser.h>
 #include <dataBuffer/mrmDataBufferType.h>
+#else
+#include <mrmDataBufferUser.h>
+#include <mrmDataBufferType.h>
+#endif
 
 /*
  *  EPICS headers
