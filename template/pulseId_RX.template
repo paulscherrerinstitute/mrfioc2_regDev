@@ -62,7 +62,7 @@ record(longin,"$(P)RX$(ID)-MTS-NSEC") {
   field(FLNK, "$(P)RX$(ID)-MTS")
 }
 
-record(longin,"$(P)RX$(ID)-UINT-CNT") {
+record(ai,"$(P)RX$(ID)-UINT-CNT") {
   field(DESC,"UINT counter")
   field(DTYP, "regDev")
   field(SCAN, "I/O Intr")
