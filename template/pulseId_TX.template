@@ -65,10 +65,9 @@ record(calcout,"$(P)TX$(ID)-MTS-NSEC") {
 record(calcout,"$(P)TX$(ID)-UINT-CNT") {
   field(DESC, "Transmit UINT count")
   field(DTYP, "regDev")
-  field(INPA, "$(P)TX$(ID)-UINT-CNT.VAL")   # master 32-bits counter
-  field(CALC, "A+1")
+  field(INPA, "$(P)TX$(ID)-PULSEID")
+  field(CALC, "A-floor(A/4294967296)*4294967296")
   field(OUT,  "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
-  field(VAL, "-1")  # so we count with the same values as pulse ID
   field(PREC, "0")
   field(FLNK, "$(P)TX$(ID)-Flush_")
 }
