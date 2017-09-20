@@ -21,12 +21,6 @@
 
 TEMPLATE_TOP=$(EPICS_BASE)/templates/makeBaseApp/top
 
-
-
-REGDEV=$(TOP)/../regdev
-MRFIOC2=$(TOP)/../mrfioc2
-
-
 # EPICS_BASE usually appears last so other apps can override stuff:
 EPICS_BASE=/opt/epics/base
 
