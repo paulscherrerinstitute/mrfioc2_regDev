@@ -7,8 +7,10 @@ include $(TOP)/configure/CONFIG
 #=============================
 # Build the IOC support library
 
+RELEASE_INCLUDES += -I$(INSTALL_LOCATION)/include/dataBuffer
+
 LIBRARY_IOC += mrfioc2_regDev
-RELEASE_INCLUDES += -I$(MRFIOC2)/include/dataBuffer
+
 mrfioc2_regDev_SRCS += mrfioc2_regDev.cpp
 
 DBD += mrfioc2_regDev.dbd
