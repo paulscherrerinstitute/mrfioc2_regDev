@@ -68,7 +68,7 @@ record(calcout,"$(P)TX$(ID)-UINT-CNT") {
   field(INPA, "$(P)TX$(ID)-UINT-CNT.VAL")   # master 32-bits counter
   field(CALC, "A+1")
   field(OUT,  "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
-  field(VAL, "-1")  # so we count with the same values as pulse ID
+  field(VAL, "0")
   field(PREC, "0")
   field(FLNK, "$(P)TX$(ID)-Flush_")
 }
