@@ -10,6 +10,8 @@
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
 #  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#  MASTPIDL_OFFSET = pulse id lower 32 bit offset (default: 0x24)
+#  MASTPIDH_OFFSET = pulse id higher 32 bit offset (default: 0x28)
 #
 # Description:
 #
@@ -69,6 +71,26 @@ record(calcout,"$(P)TX$(ID)-UINT-CNT") {
   field(CALC, "A+1")
   field(OUT,  "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
   field(VAL, "0")
+  field(PREC, "0")
+  field(FLNK, "$(P)TX$(ID)-PIDL")
+}
+
+record(calcout,"$(P)TX$(ID)-PIDL") {
+  field(DESC, "Transmit Pulse ID Lower 32 bit")
+  field(DTYP, "regDev")
+  field(INPA, "$(P)TX$(ID)-PULSEID")
+  field(CALC, "A-floor(A/4294967296)*4294967296")
+  field(OUT,  "@$(NAME):$(MASTPIDL_OFFSET=0x24) T=UINT32")
+  field(PREC, "0")
+  field(FLNK, "$(P)TX$(ID)-PIDH")
+}
+
+record(calcout,"$(P)TX$(ID)-PIDH") {
+  field(DESC, "Transmit Pulse ID Higher 32 bit")
+  field(DTYP, "regDev")
+  field(INPA, "$(P)TX$(ID)-PULSEID")
+  field(CALC, "floor(A/4294967296)")
+  field(OUT,  "@$(NAME):$(MASTPIDH_OFFSET=0x28) T=UINT32")
   field(PREC, "0")
   field(FLNK, "$(P)TX$(ID)-Flush_")
 }

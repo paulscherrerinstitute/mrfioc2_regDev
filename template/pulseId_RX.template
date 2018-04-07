@@ -70,6 +70,22 @@ record(ai,"$(P)RX$(ID)-UINT-CNT") {
   field(PRIO, "HIGH")
 }
 
+record(ai,"$(P)RX$(ID)-PIDL") {
+  field(DESC,"Pulse ID Lower 32 bit")
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTPIDL_OFFSET=0x24) T=UINT32")
+  field(PRIO, "HIGH")
+}
+
+record(ai,"$(P)RX$(ID)-PIDH") {
+  field(DESC,"Pulse ID Higher 32 bit")
+  field(DTYP, "regDev")
+  field(SCAN, "I/O Intr")
+  field(INP, "@$(NAME):$(MASTPIDH_OFFSET=0x28) T=UINT32")
+  field(PRIO, "HIGH")
+}
+
 # reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
 # Everey record that wants timestamp of the master sets its TSEL field
