@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>773</width>
-    <height>256</height>
+    <height>377</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -233,100 +233,17 @@
       <x>5</x>
       <y>40</y>
       <width>395</width>
-      <height>201</height>
+      <height>332</height>
      </rect>
     </property>
     <property name="title">
      <string/>
     </property>
-    <widget class="caLineEdit" name="calineedit_2">
-     <property name="geometry">
-      <rect>
-       <x>139</x>
-       <y>20</y>
-       <width>231</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="channel" stdset="0">
-      <string notr="true">$(P)$(MODE)-PULSEID</string>
-     </property>
-     <property name="unitsEnabled">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="caLabel" name="calabel_4">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>20</y>
-       <width>90</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Pulse ID:</string>
-     </property>
-    </widget>
-    <widget class="caLabel" name="calabel_8">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>120</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>32-bit counter:</string>
-     </property>
-    </widget>
-    <widget class="caLineEdit" name="calineedit_7">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>50</y>
-       <width>231</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="channel" stdset="0">
-      <string notr="true">$(P)$(MODE)-UINT-CNT</string>
-     </property>
-     <property name="unitsEnabled">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>90</y>
+       <y>140</y>
        <width>351</width>
        <height>101</height>
       </rect>
@@ -423,19 +340,214 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_2">
+    </widget>
+    <widget class="QGroupBox" name="groupBox_7">
+     <property name="geometry">
+      <rect>
+       <x>19</x>
+       <y>260</y>
+       <width>352</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>32-bit counter</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <widget class="caLabel" name="calabel_8">
       <property name="geometry">
        <rect>
         <x>-10</x>
-        <y>90</y>
-        <width>371</width>
-        <height>16</height>
+        <y>31</y>
+        <width>120</width>
+        <height>20</height>
        </rect>
       </property>
-      <property name="title">
-       <string/>
+      <property name="text">
+       <string>32-bit counter:</string>
       </property>
-      <property name="flat">
+     </widget>
+     <widget class="caLineEdit" name="calineedit_7">
+      <property name="geometry">
+       <rect>
+        <x>122</x>
+        <y>31</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(P)$(MODE)-UINT-CNT</string>
+      </property>
+      <property name="unitsEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>18</x>
+       <y>6</y>
+       <width>357</width>
+       <height>132</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Pulse ID</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <widget class="caLabel" name="calabel_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>90</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Pulse ID:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_2">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>26</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(P)$(MODE)-PULSEID</string>
+      </property>
+      <property name="unitsEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_11">
+      <property name="geometry">
+       <rect>
+        <x>-10</x>
+        <y>63</y>
+        <width>120</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>32 bit low:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_8">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>63</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(P)$(MODE)-PIDL</string>
+      </property>
+      <property name="unitsEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_12">
+      <property name="geometry">
+       <rect>
+        <x>-10</x>
+        <y>100</y>
+        <width>120</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>32 bit high:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_9">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>100</y>
+        <width>231</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(P)$(MODE)-PIDH</string>
+      </property>
+      <property name="unitsEnabled">
        <bool>true</bool>
       </property>
      </widget>
@@ -469,7 +581,7 @@
      <set>Qt::AlignLeading</set>
     </property>
     <property name="styleSheet" stdset="0">
-     <string notr="true">background-color: rgba(255, 255, 255, 0); color: rgba(0, 0, 0, 255);</string>
+     <string notr="true">background-color: rgba(255, 255, 255, 0); color: rgba(0, 0, 0, 255); border: 0px solid rgba(0, 0, 0, 255)</string>
     </property>
    </widget>
    <zorder>calabel</zorder>
