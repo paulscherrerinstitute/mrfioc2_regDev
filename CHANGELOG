@@ -1,0 +1,7 @@
+1.0.1 : Mo 09 April 2018:
+  - Fixed 32 bit RX-UINT-CNT counter.
+    Changed record type from longin to ai because longin is signed.
+  - Fixed vanilla build.
+  - Added RHEL7 support.
+  - Added distribution of pulse id 32 bit low and high.
+
