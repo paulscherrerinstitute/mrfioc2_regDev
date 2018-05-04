@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>773</width>
-    <height>377</height>
+    <height>375</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>408</x>
       <y>40</y>
       <width>361</width>
-      <height>201</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="title">
@@ -55,7 +55,7 @@
       <property name="geometry">
        <rect>
         <x>-10</x>
-        <y>190</y>
+        <y>60</y>
         <width>371</width>
         <height>16</height>
        </rect>
@@ -96,7 +96,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>90</y>
+        <y>100</y>
         <width>221</width>
         <height>20</height>
        </rect>
@@ -124,7 +124,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>60</y>
+        <y>70</y>
         <width>221</width>
         <height>20</height>
        </rect>
@@ -165,7 +165,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>60</y>
+        <y>70</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -181,7 +181,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>90</y>
+        <y>100</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -197,32 +197,75 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>130</y>
+        <y>160</y>
         <width>141</width>
-        <height>47</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Sans Serif</family>
-        <pointsize>13</pointsize>
+        <pointsize>15</pointsize>
         <weight>75</weight>
         <italic>false</italic>
         <bold>true</bold>
        </font>
       </property>
       <property name="text">
-       <string>Reset
- Max. Value</string>
+       <string>Reset</string>
       </property>
       <property name="channel" stdset="0">
-       <string notr="true">$(P)$(MODE)-PERF-MAX</string>
+       <string notr="true">$(P)$(MODE)-RST-PERF.PROC</string>
       </property>
       <property name="pressMessage">
-       <string notr="true">0</string>
+       <string notr="true">1</string>
       </property>
       <property name="styleSheet" stdset="0">
        <string notr="true">QPushButton{ background-color: rgba(232, 232, 232, 255); color: rgba(0, 0, 0, 255); border-color: rgba(155, 155, 155, 255);border-radius: 1px; padding: 0px; border-width: 3px;border-style: outset; margin:0px;}QPushButton:disabled { color: rgba(160, 160, 164, 255);}QPushButton:hover {background-color: rgba(255, 255, 255, 255);}  QPushButton:pressed {background-color: rgba(155, 155, 155, 255)};</string>
+      </property>
+     </widget>
+     <widget class="caLabel" name="calabel_13">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>130</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Time betwen two successive arivals</string>
+      </property>
+      <property name="text">
+       <string>Last reset at:</string>
+      </property>
+     </widget>
+     <widget class="caLineEdit" name="calineedit_10">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>130</y>
+        <width>221</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="channel" stdset="0">
+       <string notr="true">$(P)$(MODE)-RST-TS</string>
+      </property>
+      <property name="unitsEnabled">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
@@ -347,7 +390,7 @@
        <x>19</x>
        <y>260</y>
        <width>352</width>
-       <height>80</height>
+       <height>61</height>
       </rect>
      </property>
      <property name="font">
@@ -369,9 +412,9 @@
      <widget class="caLabel" name="calabel_8">
       <property name="geometry">
        <rect>
-        <x>-10</x>
+        <x>0</x>
         <y>31</y>
-        <width>120</width>
+        <width>118</width>
         <height>20</height>
        </rect>
       </property>
@@ -565,7 +608,7 @@
     <property name="font">
      <font>
       <family>Sans Serif</family>
-      <pointsize>19</pointsize>
+      <pointsize>18</pointsize>
       <weight>75</weight>
       <italic>false</italic>
       <bold>true</bold>
