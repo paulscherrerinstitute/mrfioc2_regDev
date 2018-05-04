@@ -18,6 +18,7 @@ DBDS += src/mrfioc2_regDev.dbd
 
 TEMPLATES += template/pulseId_RX.template
 TEMPLATES += template/pulseId_TX.template
+TEMPLATES += template/perf.template
 
 
 # If there is no numbered version of the mrfioc2 driver available

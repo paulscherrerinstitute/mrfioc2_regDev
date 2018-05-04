@@ -23,9 +23,6 @@
 #  $(P)TX$(ID)-MTS-SEC  - Transmitted master timestamp seconds
 #  $(P)TX$(ID)-MTS-NSEC - Transmitted master timestamp nanoseconds
 #  $(P)TX$(ID)-MTS      - Timestamp of this record will be taken to transmit
-#  $(P)TX$(ID)-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
-#  $(P)TX$(ID)-PERF     - Time between current and previous processing
-#  $(P)TX$(ID)-PERF-MAX - Max jitter - difference between two transmisions minus 10 ms
 
 record(ao, "$(P)TX$(ID)-PULSEID") {
   field(DESC,"Pulse ID to transmit")
@@ -102,46 +99,3 @@ record(longout, "$(P)TX$(ID)-Flush_") {
   field(FLNK,"$(P)TX$(ID)-JMP-CNT")
 }
 
-record(calc,"$(P)TX$(ID)-JMP-CNT") { 
-  field(DESC,"Jump counter")        
-  field(INPA,"$(P)TX$(ID)-PULSEID")
-  field(INPB,"-1")
-  field(INPC,"$(P)TX$(ID)-JMP-CNT")
-  field(CALC,"A-B#1?C+1:C;B:=A")
-  field(PRIO, "HIGH")
-  field(FLNK,"$(P)TX$(ID)-PERF-CURR_")
-}
-
-#### measures time interval between pulse ID arrivals ###
-record(ai,"$(P)TX$(ID)-PERF-CURR_") {
-  field(DTYP,"Soft Timestamp")
-  field(PREC,"9")
-  field(PRIO,"HIGH")
-  field(FLNK,"$(P)TX$(ID)-PERF")
-}
-
-##Time from previous in us
-record(calc,"$(P)TX$(ID)-PERF"){
-  field(DESC,"Time from previous processing in us")
-  field(INPA,"$(P)TX$(ID)-PERF-CURR_ NPP")
-  field(INPB,"$(P)TX$(ID)-PERF-PREV_ NPP")
-  field(CALC,"(A-B)*1000")
-  field(PREC,"9")
-  field(FLNK,"$(P)TX$(ID)-PERF-PREV_")
-}
-
-record(ai, "$(P)TX$(ID)-PERF-PREV_"){
-  field(DESC,"Performance meas previous time")
-  field(INP, "$(P)TX$(ID)-PERF-CURR_ NPP")
-  field(PREC,"9" )
-  field(FLNK,"$(P)TX$(ID)-PERF-MAX")
-}
-
-record(calc,"$(P)TX$(ID)-PERF-MAX"){
-  field(DESC,"Performance meas max jitter")
-  field(INPA,"$(P)TX$(ID)-PERF NPP")
-  field(INPB,"$(P)TX$(ID)-PERF-MAX NPP")
-  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
-  field(PREC,"9")
-  field(EGU, "ms")
-}

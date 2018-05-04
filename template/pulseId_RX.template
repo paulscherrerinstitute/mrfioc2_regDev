@@ -22,9 +22,6 @@
 #  $(P)RX$(ID)-MTS-NSEC - Received master timestamp nanoseconds
 #  $(P)RX$(ID)-MTS      - Holds master timestamp in TIME field. 
 #					           To use it use TSEL field in your record. See below.
-#  $(P)RX$(ID)-JMP-CNT  - Counts when two successive Pulse IDs do not differ by 1
-#  $(P)RX$(ID)-PERF     - Time between current and previous arrival
-#  $(P)RX$(ID)-PERF-MAX - Max jitter - difference between succesive arrivals minus 10 ms
 
 record(ai, "$(P)RX$(ID)-PULSEID") {
   field(DESC,"Received pulse ID")
@@ -33,16 +30,6 @@ record(ai, "$(P)RX$(ID)-PULSEID") {
   field(SCAN, "I/O Intr")
   field(PRIO, "HIGH")
   field(FLNK, "$(P)RX$(ID)-JMP-CNT")
-}
-
-record(calc,"$(P)RX$(ID)-JMP-CNT") {
-  field(DESC,"Jump counter")         
-  field(INPA,"$(P)RX$(ID)-PULSEID")
-  field(INPB,"-1")
-  field(INPC,"$(P)RX$(ID)-JMP-CNT")
-  field(CALC,"A-B#1?C+1:C;B:=A")
-  field(PRIO, "HIGH")
-  field(FLNK,"$(P)RX$(ID)-PERF-CURR_")
 }
 
 record(longin,"$(P)RX$(ID)-MTS-SEC") {
@@ -108,38 +95,4 @@ record(calcout,"$(P)RX$(ID)-MTS") {
   field(TSE,"-2")
   field(PRIO, "HIGH")
   field(FLNK,"$(MTS_FLNK=)")
-}
-
-#### measures time interval between pulse ID arraivals ###
-record(ai,"$(P)RX$(ID)-PERF-CURR_") {
-  field(DTYP,"Soft Timestamp")
-  field(PREC,"9")
-  field(PRIO,"HIGH")
-  field(FLNK,"$(P)RX$(ID)-PERF")
-}
-
-##Time from previous in us
-record(calc,"$(P)RX$(ID)-PERF"){
-  field(DESC,"Time from previous arrival in us")
-  field(INPA,"$(P)RX$(ID)-PERF-CURR_ NPP")
-  field(INPB,"$(P)RX$(ID)-PERF-PREV_ NPP")
-  field(CALC,"(A-B)*1000")
-  field(PREC,"9")
-  field(FLNK,"$(P)RX$(ID)-PERF-PREV_")
-}
-
-record(ai, "$(P)RX$(ID)-PERF-PREV_"){
-  field(DESC,"Performance meas previous time")
-  field(INP, "$(P)RX$(ID)-PERF-CURR_ NPP")
-  field(PREC,"9" )
-  field(FLNK,"$(P)RX$(ID)-PERF-MAX")
-}
-
-record(calc,"$(P)RX$(ID)-PERF-MAX"){
-  field(DESC,"Performance meas max jitter")
-  field(INPA,"$(P)RX$(ID)-PERF NPP")
-  field(INPB,"$(P)RX$(ID)-PERF-MAX NPP")
-  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
-  field(PREC,"9")
-  field(EGU, "ms")
 }
