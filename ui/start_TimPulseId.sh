@@ -1,13 +1,11 @@
 #!/bin/bash
 set -o errexit
 
-#Set caqtdm display path - to retrieve the stylesheet file
-export CAQTDM_DISPLAY_PATH=/sf/op/config/qt:$CAQTDM_DISPLAY_PATH
-
 SYS=""
 DEVICE="EVR0"
 SCREEN="G_TI_PULSEID.ui"
 MODE="RX"
+ATTACH="-attach"
 ID=""
 
 usage()
@@ -18,12 +16,13 @@ usage()
     echo "    -d <DEVICE name>     Timing card name (ie EVR0) - (default: $DEVICE)."
     echo "    -m <mode>     	   For Data Buffer Transmission mode use 'TX' - (default: $MODE)."
     echo "    -i <ID>              ID used in startup script when instantionating records - (default: empty)."
+    echo "    -n                   Do not attach to existing caQtDM. Open new one instead"
     echo "    -h                   This help."
 }
 
 s_flag=0 # reset s_flag (-s is required)
 
-while getopts ":s:d:m:i:h" o; do
+while getopts ":s:d:m:i:nh" o; do
     case "${o}" in
         s)
             SYS=${OPTARG}
@@ -32,15 +31,15 @@ while getopts ":s:d:m:i:h" o; do
         d)
             DEVICE=${OPTARG}
             ;;
-
         m)
             MODE=${OPTARG}
             ;;
-            
         i)
             ID=${OPTARG}
             ;;
-
+        n)
+            ATTACH=""
+            ;;
         h)
             usage
             exit 0
@@ -61,6 +60,6 @@ fi
 macro="P=$SYS-$DEVICE:,MODE=$MODE$ID"
 
 #'startDM' should be replaced with 'caqtdm' once the new version of caqtdm is out.
-startDM -stylefile sfop.qss -macro "$macro" $SCREEN &
+caqtdm -stylefile /sf/op/config/qt/sfop.qss $ATTACH -macro "$macro" $SCREEN &
 
 
