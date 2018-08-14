@@ -1,3 +1,8 @@
+1.0.2 : Tu 14 August 2018:
+  - Added auto reset function for performance figures
+  - Deleted restriction to build for newer EPICS versions
+  - Changed start UI script to use caqtdm
+
 1.0.1 : Mo 09 April 2018:
   - Fixed 32 bit RX-UINT-CNT counter.
     Changed record type from longin to ai because longin is signed.

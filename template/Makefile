@@ -8,9 +8,10 @@ include $(TOP)/configure/CONFIG
 
 
 
-## Install tempalates
+## Install templates
 DB += pulseId_RX.template
 DB += pulseId_TX.template
+DB += perf.template
 
 
 

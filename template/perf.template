@@ -1,0 +1,96 @@
+# Performance measurements
+#
+# Mandatory macros:
+#   P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:
+#   MODE = Transmitting or receiving, valid options: RX or TX
+#   ID = Used when multiple instances of the template are loaded. Defaults to empty string.
+#
+# Optional macros:
+#   AUTORST_TIME = Time in seconds, after ioc init, that the performance values are reset.
+#                  Default value is 60 s.   
+#
+# Description:
+#
+# Agnostic to RX and TX, instantiate for each.
+# Holds performance values. The template is agnostic to RX and TX, and should be instantiated for each.
+#
+# Important Records:
+#  $(P)$(MODE)$(ID)-JMP-CNT     - Counts when two successive Pulse IDs do not differ by 1
+#  $(P)$(MODE)$(ID)-PERF        - Time between current and previous arrival
+#  $(P)$(MODE)$(ID)-PERF-MAX    - Max jitter - difference between succesive arrivals minus 10 ms
+#  $(P)$(MODE)$(ID)-AUTORST-CNT - Auto reset at IOC boot, determines after how many seconds the performance value will be reset.
+
+record(calc,"$(P)$(MODE)$(ID)-JMP-CNT") {
+  field(DESC,"Jump counter")
+  field(INPA,"$(P)$(MODE)$(ID)-PULSEID")
+  field(INPB,"-1")
+  field(INPC,"$(P)$(MODE)$(ID)-JMP-CNT")
+  field(CALC,"A-B#1?C+1:C;B:=A")
+  field(PRIO, "HIGH")
+  field(FLNK,"$(P)$(MODE)$(ID)-PERF-CURR_")
+}
+
+# Measures time interval between pulse ID arrivals
+record(ai,"$(P)$(MODE)$(ID)-PERF-CURR_") {
+  field(DTYP,"Soft Timestamp")
+  field(PREC,"9")
+  field(PRIO,"HIGH")
+  field(FLNK,"$(P)$(MODE)$(ID)-PERF")
+}
+
+# Time from previous in us   
+record(calc,"$(P)$(MODE)$(ID)-PERF"){
+  field(DESC,"Time from previous arrival in us")
+  field(INPA,"$(P)$(MODE)$(ID)-PERF-CURR_ NPP")
+  field(INPB,"$(P)$(MODE)$(ID)-PERF-PREV_ NPP")
+  field(CALC,"(A-B)*1000")
+  field(PREC,"9")
+  field(FLNK,"$(P)$(MODE)$(ID)-PERF-PREV_")
+}
+
+record(ai, "$(P)$(MODE)$(ID)-PERF-PREV_"){
+  field(DESC,"Performance meas previous time")
+  field(INP, "$(P)$(MODE)$(ID)-PERF-CURR_ NPP")
+  field(PREC,"9" )
+  field(FLNK,"$(P)$(MODE)$(ID)-PERF-MAX")
+}
+
+record(calc,"$(P)$(MODE)$(ID)-PERF-MAX"){
+  field(DESC,"Performance meas max jitter")
+  field(INPA,"$(P)$(MODE)$(ID)-PERF NPP")
+  field(INPB,"$(P)$(MODE)$(ID)-PERF-MAX NPP")
+  field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
+  field(PREC,"9")
+  field(EGU, "ms")
+}
+
+## Automatic reset after IOC reboot
+
+record(calcout,"$(P)$(MODE)$(ID)-AUTORST-CNT"){
+  field(DESC,"Automatically reset performance values")
+  field(SCAN,"1 second")
+  field(CALC,"B = A ? 1 : 0; B := B + 1" )
+  field(INPA,"$(AUTORST_TIME=60)")
+  field(INPB,"0")
+  field(OOPT,"Transition To Non-zero")
+  field(OUT, "$(P)$(MODE)$(ID)-RST-PERF.PROC PP") 
+}
+
+record(seq,"$(P)$(MODE)$(ID)-RST-PERF"){
+  field(DESC,"Reset perf values and disable auto reset")
+  field(DO1, "0")
+  field(LNK1,"$(P)$(MODE)$(ID)-PERF-MAX")
+  field(DO2, "0")
+  field(LNK2,"$(P)$(MODE)$(ID)-JMP-CNT")
+  field(DO3, "1")
+  field(LNK3,"$(P)$(MODE)$(ID)-RST-TS.PROC PP")
+  field(DO4, "1")
+  field(LNK4,"$(P)$(MODE)$(ID)-AUTORST-CNT.DISA")
+}
+
+record(stringin,"$(P)$(MODE)$(ID)-RST-TS")
+{
+    field(DESC,"Timestamp of last reset")
+    field(DTYP,"Soft Timestamp" )
+    field(INP, "@%Y-%m-%d %H:%M:%S" )
+}

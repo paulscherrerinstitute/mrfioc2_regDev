@@ -6,3 +6,4 @@ mrfioc2_regDevConfigure $(NAME=$(DEVICE=EVG0)DBUF$(TYPE=300)) $(DEVICE=EVG0) $(T
 
 ## Data buffer receive template for pulse ID
 dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/pulseId_TX.template", "P=$(SYS)-$(DEVICE=EVG0):, NAME=$(NAME=$(DEVICE=EVG0)DBUF$(TYPE=300)), ID=$(ID=)")
+dbLoadRecords("$(mrfioc2_regDev_TEMPLATES)/perf.template", "P=$(SYS)-$(DEVICE=EVG0):, ID=$(ID=), MODE=TX, AUTORST_TIME=$(PERF_AUTORST_TIME=60)")
