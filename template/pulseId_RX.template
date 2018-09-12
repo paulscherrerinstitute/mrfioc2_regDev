@@ -10,7 +10,14 @@
 #  MASTSEC_OFFSET = seconds offset (default: 0x18)
 #  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
 #  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
-#  MTS_FLNK = FLNK to be processed after Master Timestamp has been read
+#  Macros related to received data, can be used to trigger processing in a user
+#  application when new data has been received.
+#  PULSEID_FLNK = FLNK to be processed after PULSEID has been received.
+#  MTS_FLNK = FLNK to be processed after Master Timestamp has been read,
+#  it guarantees the raw data in MTS-SEC and MTS-NSEC has been received.
+#  UINTCNT_FLNK = FLNK to be processed after UINT-CNT has been received.
+#  PIDL_FLNK = FLNK to be processed after PIDL has been received.
+#  PIDH_FLNK = FLNK to be processed after PIDH has been received.
 #
 # Description:
 #
@@ -29,7 +36,15 @@ record(ai, "$(P)RX$(ID)-PULSEID") {
   field(INP, "@$(NAME):$(PULSEID_OFFSET=0x10) T=double")
   field(SCAN, "I/O Intr")
   field(PRIO, "HIGH")
-  field(FLNK, "$(P)RX$(ID)-JMP-CNT")
+  field(FLNK, "$(P)RX$(ID)-PULSEID_FO")
+}
+
+# Forward link to performance measurement and then user application.
+# Order is deliberatly chosen to make sure we measure performance value
+# consistently in all nodes.
+record(fanout, "$(P)RX$(ID)-PULSEID_FO") {
+  field(LNK1, "$(P)RX$(ID)-JMP-CNT")
+  field(LNK2, "$(PULSEID_FLNK=)")
 }
 
 record(longin,"$(P)RX$(ID)-MTS-SEC") {
@@ -55,6 +70,7 @@ record(ai,"$(P)RX$(ID)-UINT-CNT") {
   field(SCAN, "I/O Intr")
   field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
   field(PRIO, "HIGH")
+  field(FLNK, "$(UINTCNT_FLNK=)")
 }
 
 record(ai,"$(P)RX$(ID)-PIDL") {
@@ -63,6 +79,7 @@ record(ai,"$(P)RX$(ID)-PIDL") {
   field(SCAN, "I/O Intr")
   field(INP, "@$(NAME):$(MASTPIDL_OFFSET=0x24) T=UINT32")
   field(PRIO, "HIGH")
+  field(FLNK, "$(PIDL_FLNK=)")
 }
 
 record(ai,"$(P)RX$(ID)-PIDH") {
@@ -71,6 +88,7 @@ record(ai,"$(P)RX$(ID)-PIDH") {
   field(SCAN, "I/O Intr")
   field(INP, "@$(NAME):$(MASTPIDH_OFFSET=0x28) T=UINT32")
   field(PRIO, "HIGH")
+  field(FLNK, "$(PIDH_FLNK=)")
 }
 
 # reads timestamp from the master SEC and NSEC
