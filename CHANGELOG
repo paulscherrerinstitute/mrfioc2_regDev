@@ -1,3 +1,6 @@
+1.0.3 : We 19 September 2018:
+  - Added forwards links for interfacing with user application
+
 1.0.2 : Tu 14 August 2018:
   - Added auto reset function for performance figures
   - Deleted restriction to build for newer EPICS versions
