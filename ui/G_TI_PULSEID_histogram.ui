@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>695</width>
+    <height>451</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLabel" name="calabel">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1131</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="statusTip">
+     <string>Operation</string>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>$(P) Data Buffer Readout - $(MODE) Histogram</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading</set>
+    </property>
+    <property name="colorMode">
+     <enum>caLabel::Default</enum>
+    </property>
+    <property name="styleSheet" stdset="0">
+     <string notr="true"/>
+    </property>
+    <property name="visibility">
+     <enum>caLabel::StaticV</enum>
+    </property>
+    <property name="visibilityCalc">
+     <string notr="true"/>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>34</y>
+      <width>691</width>
+      <height>415</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+    <widget class="caMessageButton" name="camessagebutton_4">
+     <property name="geometry">
+      <rect>
+       <x>545</x>
+       <y>15</y>
+       <width>140</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset histogram values</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(P)$(MODE)-PERF-HIST-RST</string>
+     </property>
+     <property name="label">
+      <string notr="true">Reset histogram values</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>212</red>
+       <green>219</green>
+       <blue>157</blue>
+      </color>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">1</string>
+     </property>
+    </widget>
+    <widget class="caCartesianPlot" name="cacartesianplot">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>50</y>
+       <width>680</width>
+       <height>361</height>
+      </rect>
+     </property>
+     <property name="TitleX">
+      <string notr="true">Time between current and previous arrival[ms]</string>
+     </property>
+     <property name="TitleY">
+      <string notr="true"/>
+     </property>
+     <property name="channels_1" stdset="0">
+      <string>$(P)$(MODE)-HIST-X-AXIS.AVAL;$(P)$(MODE)-PERF-HIST</string>
+     </property>
+     <property name="Style_1">
+      <enum>caCartesianPlot::Sticks</enum>
+     </property>
+     <property name="color_1">
+      <color>
+       <red>0</red>
+       <green>0</green>
+       <blue>255</blue>
+      </color>
+     </property>
+     <property name="foreground">
+      <color>
+       <red>220</red>
+       <green>220</green>
+       <blue>220</blue>
+      </color>
+     </property>
+     <property name="background">
+      <color>
+       <red>255</red>
+       <green>255</green>
+       <blue>255</blue>
+      </color>
+     </property>
+     <property name="YaxisScaling" stdset="0">
+      <enum>caCartesianPlot::User</enum>
+     </property>
+     <property name="YaxisLimits">
+      <string>0;20</string>
+     </property>
+     <property name="YaxisEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="LegendEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>15</y>
+       <width>105</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Last reset at:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="caLineEdit" name="calineedit_8">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>15</y>
+       <width>170</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>12:00:00 01-07-2018</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">$(P)$(MODE)-PERF-HIST-TS</string>
+     </property>
+     <property name="frameColor">
+      <color>
+       <red>200</red>
+       <green>200</green>
+       <blue>200</blue>
+      </color>
+     </property>
+     <property name="frameLineWidth" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="precision">
+      <number>5</number>
+     </property>
+     <property name="precisionMode">
+      <enum>caLineEdit::Channel</enum>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+  </customwidget>
+  <customwidget>
+   <class>caMessageButton</class>
+   <extends>QPushButton</extends>
+   <header>caMessageButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QwtPlot</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

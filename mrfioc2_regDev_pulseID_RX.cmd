@@ -1,4 +1,6 @@
 require settimestamp
+require histogram
+require SynApps
 
 # Initialize the reg dev to data buffer connection
 mrfioc2_regDevConfigure $(NAME=$(DEVICE=EVR0)DBUF$(TYPE=300)) $(DEVICE=EVR0) $(TYPE=300) $(PROTOCOL=0) $(USER_OFFSET=16)

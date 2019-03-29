@@ -1,5 +1,7 @@
 # used to set the timstamp for the SEC and NSEC records
 require settimestamp
+require histogram
+require SynApps
 
 # Initialize the reg dev to data buffer connection
 mrfioc2_regDevConfigure $(NAME=$(DEVICE=EVG0)DBUF$(TYPE=300)) $(DEVICE=EVG0) $(TYPE=300) $(PROTOCOL=0) $(USER_OFFSET=16)

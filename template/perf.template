@@ -62,6 +62,45 @@ record(calc,"$(P)$(MODE)$(ID)-PERF-MAX"){
   field(CALC,"ABS(10-A) > B ? ABS(10-A) : B")
   field(PREC,"9")
   field(EGU, "ms")
+  field(FLNK,"$(P)$(MODE)$(ID)-PERF-HIST")
+}
+
+record(histogram, "$(P)$(MODE)$(ID)-PERF-HIST"){
+  field(DESC, "histogram")
+  field(DTYP, "Soft Channel")
+  field(SVL , "$(P)$(MODE)$(ID)-PERF NPP")
+  field(NELM, "200")
+  field(ULIM, "20")
+  field(LLIM, "0")
+}
+
+# histogram X axis (jitter)
+record(acalcout, "$(P)$(MODE)$(ID)-HIST-X-AXIS"){
+   field(INPA, "0.1")
+   field(NELM, "200")
+   field(CALC, "IX*A")
+   field(EGU,  "ms")
+   field(PINI, "YES")
+}
+
+# reset histogram
+record(ao,"$(P)$(MODE)$(ID)-PERF-HIST-RST"){
+  field(DESC,"Reset Hist")
+  field(VAL, "1")
+  field(OUT, "$(P)$(MODE)$(ID)-PERF-HIST.CMD")
+  field(FLNK, "$(P)$(MODE)$(ID)-PERF-HIST-TS")
+}
+
+record(stringin,"$(P)$(MODE)$(ID)-PERF-HIST-TS-OUT"){
+  field(DESC,"Timestamp of last reset")
+  field(DTYP,"Soft Timestamp" )
+  field(INP, "@%Y-%m-%d %H:%M:%S" )
+}
+
+record(stringin,"$(P)$(MODE)$(ID)-PERF-HIST-TS"){
+  field(DESC,"Timestamp of last reset")
+  field(VAL, "No reset since start-up" )
+  field(INP, "$(P)$(MODE)$(ID)-PERF-HIST-TS-OUT PP")
 }
 
 ## Automatic reset after IOC reboot

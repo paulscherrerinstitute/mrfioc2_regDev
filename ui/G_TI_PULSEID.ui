@@ -627,12 +627,47 @@
      <string notr="true">background-color: rgba(255, 255, 255, 0); color: rgba(0, 0, 0, 255); border: 0px solid rgba(0, 0, 0, 255)</string>
     </property>
    </widget>
+   <widget class="caRelatedDisplay" name="histogram">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>345</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="label">
+     <string notr="true">Histograms</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>183</red>
+      <green>157</green>
+      <blue>92</blue>
+     </color>
+    </property>
+    <property name="labels">
+     <string notr="true">Histogram</string>
+    </property>
+    <property name="files">
+     <string notr="true">G_TI_PULSEID_histogram.ui</string>
+    </property>
+    <property name="args">
+     <string notr="true">P=$(P),MODE=$(MODE)</string>
+    </property>
+   </widget>
    <zorder>calabel</zorder>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_4</zorder>
+   <zorder>histogram</zorder>
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>caRelatedDisplay</class>
+   <extends>QWidget</extends>
+   <header>caRelatedDisplay</header>
+  </customwidget>
   <customwidget>
    <class>caMessageButton</class>
    <extends>QPushButton</extends>
