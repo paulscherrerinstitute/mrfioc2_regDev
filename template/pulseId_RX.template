@@ -44,16 +44,16 @@ record(ai, "$(P)RX$(ID)-PULSEID") {
 # consistently in all nodes.
 record(fanout, "$(P)RX$(ID)-PULSEID_FO") {
   field(LNK1, "$(P)RX$(ID)-JMP-CNT")
-  field(LNK2, "$(PULSEID_FLNK=)")
+  field(LNK2, "$(P)RX$(ID)-MTS-SEC")
 }
 
 record(longin,"$(P)RX$(ID)-MTS-SEC") {
   field(DESC,"Master timestamp - seconds") 
   field(DTYP, "regDev")
-  field(SCAN, "I/O Intr")
+  field(SCAN, "Passive")
   field(INP, "@$(NAME):$(MASTSEC_OFFSET=0x18) T=UINT32")
-  field(FLNK, "$(P)RX$(ID)-MTS-NSEC")
   field(PRIO, "HIGH")
+  field(FLNK, "$(P)RX$(ID)-MTS-NSEC")  
 }
 
 record(longin,"$(P)RX$(ID)-MTS-NSEC") {
@@ -61,36 +61,36 @@ record(longin,"$(P)RX$(ID)-MTS-NSEC") {
   field(DTYP, "regDev")
   field(INP, "@$(NAME):$(MASTNSEC_OFFSET=0x1C) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(P)RX$(ID)-MTS")
+  field(FLNK, "$(P)RX$(ID)-UINT-CNT")
 }
 
 record(ai,"$(P)RX$(ID)-UINT-CNT") {
   field(DESC,"UINT counter")
   field(DTYP, "regDev")
-  field(SCAN, "I/O Intr")
+  field(SCAN, "Passive")
   field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(UINTCNT_FLNK=)")
+  field(FLNK, "$(P)RX$(ID)-PIDL")
 }
 
 record(ai,"$(P)RX$(ID)-PIDL") {
   field(DESC,"Pulse ID Lower 32 bit")
   field(DTYP, "regDev")
-  field(SCAN, "I/O Intr")
+  field(SCAN, "Passive")
   field(INP, "@$(NAME):$(MASTPIDL_OFFSET=0x24) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(PIDL_FLNK=)")
+  field(FLNK, "$(P)RX$(ID)-PIDH")
 }
 
 record(ai,"$(P)RX$(ID)-PIDH") {
   field(DESC,"Pulse ID Higher 32 bit")
   field(DTYP, "regDev")
-  field(SCAN, "I/O Intr")
+  field(SCAN, "Passive")
   field(INP, "@$(NAME):$(MASTPIDH_OFFSET=0x28) T=UINT32")
   field(PRIO, "HIGH")
-  field(FLNK, "$(PIDH_FLNK=)")
+  field(FLNK, "$(P)RX$(ID)-MTS")
 }
-
+  
 # reads timestamp from the master SEC and NSEC
 # and set the timestamp of this record
 # Everey record that wants timestamp of the master sets its TSEL field
@@ -112,5 +112,15 @@ record(calcout,"$(P)RX$(ID)-MTS") {
   field(INPB,"$(P)RX$(ID)-MTS-NSEC")
   field(TSE,"-2")
   field(PRIO, "HIGH")
-  field(FLNK,"$(MTS_FLNK=)")
+  field(FLNK,"$(P)RX$(ID)-FLNK_FO")
+}
+
+# The following Links are obsolete.
+# They are supported for backward compatibility
+record(fanout, "$(P)RX$(ID)-FLNK_FO") {
+  field(LNK1, "$(PULSEID_FLNK=)")
+  field(LNK2, "$(UINTCNT_FLNK=)")
+  field(LNK3, "$(MTS_FLNK=)")
+  field(LNK4, "$(PIDL_FLNK=)")
+  field(LNK5, "$(PIDH_FLNK=)")
 }
