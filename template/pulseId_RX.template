@@ -70,6 +70,28 @@ record(ai,"$(P)RX$(ID)-UINT-CNT") {
   field(SCAN, "Passive")
   field(INP, "@$(NAME):$(MASTUINTCNT_OFFSET=0x20) T=UINT32")
   field(PRIO, "HIGH")
+  field(FLNK, "$(P)RX$(ID)-UINT-CNT-CALC")
+}
+
+## Automatic reset of perf values after master reboots
+record(calcout,"$(P)RX$(ID)-UINT-CNT-CALC"){
+  field(DESC,"Automatically reset performance values")
+  field(CALC,"A<B")
+  field(INPA,"$(P)RX$(ID)-UINT-CNT")
+  field(INPB,"$(P)RX$(ID)-UINT-CNT-PREV")
+  field(OOPT,"When Non-zero")
+  field(OUT, "$(P)RX$(ID)-RST-PERF.PROC PP")
+  field(FLNK,"$(P)RX$(ID)-UINT-CNT-PREV_")
+}
+
+record(calcout,"$(P)RX$(ID)-UINT-CNT-PREV_"){
+  field(INPA,"$(P)RX$(ID)-UINT-CNT NPP")
+  field(CALC,"A")
+  field(OUT, "$(P)RX$(ID)-UINT-CNT-PREV.VAL PP")
+}
+
+record(ai, "$(P)RX$(ID)-UINT-CNT-PREV"){
+  field(DESC, "UINT counter previous")
   field(FLNK, "$(P)RX$(ID)-PIDL")
 }
 
