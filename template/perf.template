@@ -125,6 +125,8 @@ record(seq,"$(P)$(MODE)$(ID)-RST-PERF"){
   field(LNK3,"$(P)$(MODE)$(ID)-RST-TS.PROC PP")
   field(DO4, "1")
   field(LNK4,"$(P)$(MODE)$(ID)-AUTORST-CNT.DISA")
+  field(DO5, "1")
+  field(LNK5,"$(P)$(MODE)$(ID)-PERF-HIST-RST.PROC PP")
 }
 
 record(stringin,"$(P)$(MODE)$(ID)-RST-TS")
