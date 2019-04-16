@@ -1,34 +1,50 @@
 # Pulse ID data buffer receive
 #
-# Mandatory macros:
-#  P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:)
-#  ID = Used when multiple instances of the template are loaded. Defaults to empty string.
-#  NAME = regDev name as configured with  mrfioc2_regDevConfigure() (ie EVR0DBUF)
-#  
-# Optional macros:
-#  PULSEID_OFFSET = address offset (0x10)
-#  MASTSEC_OFFSET = seconds offset (default: 0x18)
-#  MASTNSEC_OFFSET = nsec offset (default: 0x1C)
-#  MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
-#  Macros related to received data, can be used to trigger processing in a user
-#  application when new data has been received.
-#  PULSEID_FLNK = FLNK to be processed after PULSEID has been received.
-#  MTS_FLNK = FLNK to be processed after Master Timestamp has been read,
-#  it guarantees the raw data in MTS-SEC and MTS-NSEC has been received.
-#  UINTCNT_FLNK = FLNK to be processed after UINT-CNT has been received.
-#  PIDL_FLNK = FLNK to be processed after PIDL has been received.
-#  PIDH_FLNK = FLNK to be processed after PIDH has been received.
-#
 # Description:
 #
-# This database receives the pulse id via databuffer
+#   This database contains records which provide data received from the data buffer.
 #
-# Important Records:
-#  $(P)RX$(ID)-PULSEID  - Received Pulse ID
-#  $(P)RX$(ID)-MTS-SEC  - Received master timestamp seconds
-#  $(P)RX$(ID)-MTS-NSEC - Received master timestamp nanoseconds
-#  $(P)RX$(ID)-MTS      - Holds master timestamp in TIME field. 
-#					           To use it use TSEL field in your record. See below.
+# Mandatory macros:
+#   P = Prefix for all records in the template eg. (SIN-CVME-TIFALL:)
+#   ID = Used when multiple instances of the template are loaded.
+#   NAME = regDev name as configured with  mrfioc2_regDevConfigure() (e.g. EVR0DBUF)
+#  
+# Optional macros:
+#
+#   Macros to define location of data in data buffer:
+#     PULSEID_OFFSET = address offset (default: 0x10)
+#     MASTSEC_OFFSET = seconds offset (default: 0x18)
+#     MASTNSEC_OFFSET = nsec offset (default: 0x1C)
+#     MASTUINTCNT_OFFSET = 32-bit master counter offset (default: 0x20)
+#
+#   The record reading the pulse id from the data buffer is processed via
+#   'I/O Intr' when new data buffer data has been received.
+#   All other records reading from the data buffer are processed
+#   in a forward link chain. The processing can be forwarded to process user
+#   defined records using the PULSEID_FLNK macro.
+#   At the time the first user record is processed, it is guaranteed that
+#   all records reading data buffer data have new data and that the data
+#   is from the same machine pulse.
+#   Macro to forward processing:
+#     PULSEID_FLNK = FLNK to forware processing when PULSEID has been received (default: "")
+#   The following macros are obsolete and are only available for backward
+#   compatibility:
+#     PIDL_FLNK = FLNK to forward processing when pulse id low has been received (default: "")
+#     PIDH_FLNK = FLNK to forward processing when pulse id high has been received (default: "")
+#     MTS_FLNK = FLNK to forward processing when master timestamp has been received (SEC and NSEC) (default: "")
+#     UINTCNT_FLNK = FLNK to forward processing when 32 bit counter has been received (default: "")
+#
+# Records holding data received via data buffer:
+#   $(P)RX$(ID)-PULSEID  | ai      | pulse id
+#   $(P)RX$(ID)-PIDH     | ai      | higher 32 bit of pulse id
+#   $(P)RX$(ID)-PIDL     | ai      | lower 32 bit of pulse id
+#   $(P)RX$(ID)-MTS-SEC  | long in | 32 bit master timestamp seconds
+#   $(P)RX$(ID)-MTS-NSEC | long in | 32 bit master timestamp nanoseconds (with embedded pulse id)
+#   $(P)RX$(ID)-UINT-CNT | ai      | 32 bit counter (starts from 0 after master restart)
+#
+# Special purpose records:
+#   $(P)RX$(ID)-MTS      | calcout | Holds master timestamp in TIME field. 
+#					                          To use it use TSEL field in your record. See below.
 
 record(ai, "$(P)RX$(ID)-PULSEID") {
   field(DESC,"Received pulse ID")
