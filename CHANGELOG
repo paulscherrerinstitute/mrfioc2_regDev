@@ -1,3 +1,8 @@
+1.0.4 : Tu 16 April 2019:
+  - Added histogram for machine pulse jitter
+  - Changed processing of RX records to be a forward chain
+  - Added auto reset for RX performance values when master IOC reboots
+
 1.0.3 : We 19 September 2018:
   - Added forwards links for interfacing with user application
 
