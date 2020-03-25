@@ -89,6 +89,51 @@ record(calcout,"$(P)TX$(ID)-PIDH") {
   field(CALC, "floor(A/4294967296)")
   field(OUT,  "@$(NAME):$(MASTPIDH_OFFSET=0x28) T=UINT32")
   field(PREC, "0")
+  field(FLNK, "$(P)TX$(ID)-SEQ-ID")
+}
+
+record(calcout,"$(P)TX$(ID)-SEQ-ID") {
+  field(DESC, "Sequence id of current pulse")
+  field(DTYP, "regDev")
+  field(INPA, "$(SEQ-ID) NPP")
+  field(CALC, "A")
+  field(OUT, "@$(NAME):0x2C T=UINT32")
+  field(FLNK, "$(P)TX$(ID)-SEQ1-START")
+}
+
+record(calcout,"$(P)TX$(ID)-SEQ1-START") {
+  field(DESC, "Sequence 1 start HW counter vaule")
+  field(DTYP, "regDev")
+  field(INPA, "$(SEQ1-START-HW-CTR) NPP")
+  field(CALC, "A")
+  field(OUT, "@$(NAME):0x30 T=UINT32")
+  field(FLNK, "$(P)TX$(ID)-SEQ1-END")
+}
+
+record(calcout,"$(P)TX$(ID)-SEQ1-END") {
+  field(DESC, "Sequence 1 end HW counter vaule")
+  field(DTYP, "regDev")
+  field(INPA, "$(SEQ1-END-HW-CTR) NPP")
+  field(CALC, "A")
+  field(OUT, "@$(NAME):0x34 T=UINT32")
+  field(FLNK, "$(P)TX$(ID)-SEQ2-START")
+}
+
+record(calcout,"$(P)TX$(ID)-SEQ2-START") {
+  field(DESC, "Sequence 2 start HW counter vaule")
+  field(DTYP, "regDev")
+  field(INPA, "$(SEQ2-START-HW-CTR) NPP")
+  field(CALC, "A")
+  field(OUT, "@$(NAME):0x38 T=UINT32")
+  field(FLNK, "$(P)TX$(ID)-SEQ2-END")
+}
+
+record(calcout,"$(P)TX$(ID)-SEQ2-END") {
+  field(DESC, "Sequence 2 end HW counter vaule")
+  field(DTYP, "regDev")
+  field(INPA, "$(SEQ2-END-HW-CTR) NPP")
+  field(CALC, "A")
+  field(OUT, "@$(NAME):0x3C T=UINT32")
   field(FLNK, "$(P)TX$(ID)-Flush_")
 }
 
