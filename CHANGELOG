@@ -1,3 +1,6 @@
+1.0.5 : Mi 25 March 2020:
+  - Added sending HW perf counter values via segmented data buffer
+
 1.0.4 : Tu 16 April 2019:
   - Added histogram for machine pulse jitter
   - Changed processing of RX records to be a forward chain
